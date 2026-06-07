@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foresee — Mobile Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/foresee.css">
+<link rel="stylesheet" href="assets/mobile.css">
+<link rel="stylesheet" href="assets/royal.css">
+<style>
+  html,body{margin:0;height:100%}
+  body{background:#1a1a1f;background:radial-gradient(120% 120% at 50% 0%,#202028,#0e0e12);
+    display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;
+    font-family:"Schibsted Grotesk",system-ui,sans-serif}
+  #root{filter:drop-shadow(0 40px 80px rgba(0,0,0,.5))}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="assets/data.jsx"></script>
+<script type="text/babel" src="frames/ios-frame.jsx"></script>
+<script type="text/babel" src="mobile/common.jsx"></script>
+<script type="text/babel" src="mobile/screens-market.jsx"></script>
+<script type="text/babel" src="mobile/screens-wallet.jsx"></script>
+<script type="text/babel" src="mobile/app.jsx"></script>
+</body>
+</html>

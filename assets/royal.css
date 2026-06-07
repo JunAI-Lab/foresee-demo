@@ -1,0 +1,64 @@
+/* ============================================================
+   FORESEE × Royal — navy + gold luxury themes
+   Maps the Mahkota royal palette onto the Foresee token names
+   so every existing component (.pill .btn .card .cat .amt .sheet…)
+   inherits the luxury skin automatically.
+   royal-light = cream/ivory page · royal-dark = deep navy
+   ============================================================ */
+
+:root{
+  --font-ui:"Schibsted Grotesk","Noto Sans SC",-apple-system,system-ui,sans-serif;
+  --font-mono:"DM Mono","Schibsted Grotesk",ui-monospace,monospace;
+  --font-disp:"DM Serif Display","Noto Serif SC",Georgia,serif;
+
+  /* raw royal palette (theme-independent) */
+  --navy:#16285C; --navy-deep:#0D1838; --navy-soft:#28396E;
+  --gold:#C9A84C; --gold-deep:#A8842B; --gold-soft:#E7D499;
+  --royal-red:#B3122B; --royal-red-deep:#8C0E21;
+  --cream:#F4F1E8; --cream-2:#ECE6D6;
+}
+
+/* ---------- LIGHT · ivory trading salon ---------- */
+[data-theme="royal-light"]{
+  --bg:#F4F1E8; --bg-2:#ECE6D6; --surface:#FFFFFF; --surface-2:#FBF9F3; --surface-3:#F1ECDD;
+  --border:rgba(22,40,92,.13); --border-2:rgba(22,40,92,.24);
+  --text:#16285C; --text-2:#5B6488; --text-3:#969CB7;
+  --brand:#A8842B; --brand-2:#C9A84C; --brand-ink:#0D1838;
+  --yes:#0E8F5E; --yes-soft:rgba(14,143,94,.11); --yes-line:rgba(14,143,94,.40); --yes-ink:#FFFFFF;
+  --no:#B3122B;  --no-soft:rgba(179,18,43,.09);  --no-line:rgba(179,18,43,.38);  --no-ink:#FFFFFF;
+  --warn:#A8842B; --warn-soft:rgba(168,132,43,.14);
+  --shadow:0 30px 70px -30px rgba(13,24,56,.40);
+  --shadow-sm:0 16px 36px -20px rgba(13,24,56,.30);
+  --glass:rgba(244,241,232,.80);
+  --pos:#0E8F5E; --neg:#B3122B;
+  --gold-on:var(--gold-deep);
+}
+
+/* ---------- DARK · deep navy box ---------- */
+[data-theme="royal-dark"]{
+  --bg:#0D1838; --bg-2:#0A1330; --surface:#16285C; --surface-2:#1B2C5E; --surface-3:#27407C;
+  --border:rgba(231,212,153,.15); --border-2:rgba(231,212,153,.30);
+  --text:#F4F1E8; --text-2:#B6BFE0; --text-3:#7B86B2;
+  --brand:#C9A84C; --brand-2:#E7D499; --brand-ink:#0D1838;
+  --yes:#1DCB86; --yes-soft:rgba(29,203,134,.15); --yes-line:rgba(29,203,134,.45); --yes-ink:#04150D;
+  --no:#FF5364;  --no-soft:rgba(255,83,100,.15);  --no-line:rgba(255,83,100,.45);  --no-ink:#FFFFFF;
+  --warn:#E7D499; --warn-soft:rgba(231,212,153,.16);
+  --shadow:0 34px 80px -28px rgba(0,0,0,.62);
+  --shadow-sm:0 16px 40px -20px rgba(0,0,0,.5);
+  --glass:rgba(13,24,56,.74);
+  --pos:#1DCB86; --neg:#FF5364;
+  --gold-on:var(--gold-soft);
+}
+
+/* gold accent helpers usable in any theme */
+.gold-text{color:var(--gold-on)}
+.serif{font-family:var(--font-disp);font-weight:400;letter-spacing:-.01em}
+
+/* gild a few shared atoms so trading chrome reads "luxury" not "fintech" */
+.cat{letter-spacing:.08em}
+.pill{border-radius:14px}
+.btn{border-radius:999px;letter-spacing:.01em}
+.btn.gold{background:var(--gold);color:var(--navy-deep)}
+.btn.gold:hover{filter:brightness(1.05)}
+.chip.on{background:var(--navy);color:var(--cream);border-color:var(--navy)}
+[data-theme="royal-dark"] .chip.on{background:var(--gold);color:var(--navy-deep);border-color:var(--gold)}
