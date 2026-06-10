@@ -351,7 +351,8 @@ function App(){
       h('div',{className:'div'}),
       h('button',{className:'w-mini',title:'Theme',onClick:()=>setTheme(t=>t==='royal-light'?'royal-dark':'royal-light')}, theme==='royal-light'?'🌙':'☀'),
       h('button',{className:'w-mini',title:'Language',onClick:()=>setLang(l=>l==='en'?'zh':'en')}, lang==='en'?'EN':'中'),
-      h('button',{className:'w-mini',title:'Mobile',style:{width:'auto',padding:'0 13px',gap:5},onClick:()=>setPhone(true)}, '📱')),
+      h('button',{className:'w-mini',title:'Mobile',style:{width:'auto',padding:'0 13px',gap:5},onClick:()=>setPhone(true)}, '📱'),
+      h('button',{className:'w-mini',title:'Live 带盘直播',style:{width:'auto',padding:'0 13px',gap:5,color:'#FF5364'},onClick:()=>{window.location.href='live.html';}}, '🔴 LIVE')),
 
     h('div',{className:'w-toast'+(toast?' on':'')}, toast));
 }
