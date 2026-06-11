@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sorak · 世界杯 Demo 选型 — 早上挑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#16285C;--navy-deep:#0D1838;--navy-2:#1B2E66;--gold:#C9A84C;--gold-deep:#A8842B;
+  --gold-soft:#E7D499;--cream:#F4F1E8;--yes:#1DCB86;--no:#FF5364;--ink:#EAE6F2;--ink-mut:#9aa0c4;
+  --line:rgba(201,168,76,.2);--card:#141d3f;--amber:#E8A33C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Schibsted Grotesk","Noto Sans SC",system-ui,sans-serif;color:var(--ink);
+  -webkit-font-smoothing:antialiased;min-height:100vh;
+  background:
+   radial-gradient(1100px 560px at 82% -8%,rgba(201,168,76,.12),transparent 60%),
+   radial-gradient(900px 500px at -5% 105%,rgba(29,203,134,.08),transparent 60%),
+   var(--navy-deep);}
+.serif{font-family:"DM Serif Display",serif}
+.mono{font-family:"DM Mono",monospace;font-variant-numeric:tabular-nums}
+a{text-decoration:none;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 20px 70px}
+
+/* header */
+.head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.wordmark{font-family:"DM Serif Display",serif;font-size:30px;letter-spacing:.5px}
+.wordmark b{color:var(--gold)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--no);display:inline-block;margin-right:7px;
+  box-shadow:0 0 0 0 rgba(255,83,100,.6);animation:pp 1.6s infinite;vertical-align:middle}
+@keyframes pp{0%{box-shadow:0 0 0 0 rgba(255,83,100,.5)}70%{box-shadow:0 0 0 9px rgba(255,83,100,0)}100%{box-shadow:0 0 0 0 rgba(255,83,100,0)}}
+.kicker{margin-left:auto;font-size:12.5px;color:var(--gold-soft);border:1px solid var(--line);
+  border-radius:999px;padding:6px 14px}
+.title{font-family:"DM Serif Display",serif;font-size:clamp(30px,5vw,50px);line-height:1.08;margin:22px 0 10px}
+.title .em{color:var(--gold-soft)}
+.lede{font-size:16px;color:var(--ink-mut);max-width:760px;line-height:1.6}
+.lede b{color:var(--ink)}
+.subline{font-size:13px;color:var(--ink-mut);margin-top:8px}
+.subline span{color:var(--gold-soft)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:34px}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:20px;overflow:hidden;background:var(--card);
+  display:flex;flex-direction:column;transition:.18s;position:relative}
+.card:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.thumb{height:172px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:16px}
+.thumb .badge{align-self:flex-start;font-size:11px;font-weight:800;letter-spacing:.6px;padding:4px 10px;border-radius:7px}
+.thumb .lett{font-family:"DM Serif Display",serif;font-size:78px;line-height:.8;opacity:.9}
+/* per-direction thumbs */
+.t-a{background:radial-gradient(120% 120% at 70% 0,rgba(201,168,76,.18),transparent 55%),linear-gradient(160deg,#0d5a2f33,#0D1838)}
+.t-a .lett{color:var(--gold-soft)}
+.t-b{background:linear-gradient(160deg,#F4F1E8,#e9e3d2)}
+.t-b .lett{color:var(--navy)}
+.t-b .badge{background:var(--navy);color:var(--gold-soft)}
+.t-c{background:radial-gradient(120% 90% at 30% 10%,rgba(29,203,134,.2),transparent 55%),linear-gradient(160deg,#1B2E66,#0D1838)}
+.t-c .lett{color:var(--gold-soft)}
+.t-admin{background:radial-gradient(120% 120% at 80% 0,rgba(232,163,60,.22),transparent 55%),linear-gradient(160deg,#241a33,#0D1838)}
+.t-admin .lett{color:var(--amber)}
+.badge.pub{background:var(--gold);color:#23180a}
+.badge.adm{background:var(--amber);color:#23180a}
+/* mini mock strips inside thumb */
+.mini{display:flex;gap:6px;align-items:flex-end}
+.mini i{display:block;border-radius:4px}
+.t-a .mini i{width:30px;height:var(--h,20px);background:linear-gradient(var(--yes),#0d5a2f)}
+.t-c .pill{font-size:10px;font-family:"DM Mono",monospace;color:var(--gold-soft);border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+.t-b .formrow{height:3px;background:var(--navy);opacity:.25;border-radius:2px;margin-top:3px}
+
+.body{padding:17px 18px 20px;display:flex;flex-direction:column;gap:11px;flex:1}
+.name{font-size:20px;font-weight:800}
+.name small{font-weight:600;color:var(--ink-mut);font-size:13px;margin-left:7px}
+.pitch{font-size:14px;color:var(--ink-mut);line-height:1.55}
+.feats{display:flex;flex-wrap:wrap;gap:6px}
+.feats span{font-size:11.5px;color:var(--gold-soft);border:1px solid var(--line);border-radius:7px;padding:3px 9px}
+.launch{margin-top:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.launch .go{flex:1;min-width:120px;text-align:center;padding:11px;border-radius:11px;font-weight:800;font-size:14px;
+  background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#23180a}
+.launch .lng{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.launch .lng a{padding:9px 11px;font-size:12.5px;font-weight:700;color:var(--ink-mut)}
+.launch .lng a:hover{background:rgba(201,168,76,.14);color:var(--ink)}
+
+/* notes */
+.notes{margin-top:40px;border:1px solid var(--line);border-radius:18px;background:#0f1736;padding:22px 24px}
+.notes h3{font-size:14px;color:var(--gold-soft);margin-bottom:12px;letter-spacing:.4px}
+.ngrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:780px){.ngrid{grid-template-columns:1fr}}
+.ngrid h4{font-size:13.5px;margin-bottom:5px}
+.ngrid p{font-size:12.5px;color:var(--ink-mut);line-height:1.6}
+.path{margin-top:18px;font-size:12px;color:var(--ink-mut);line-height:1.9;border-top:1px solid var(--line);padding-top:14px}
+.path code{font-family:"DM Mono",monospace;color:var(--gold-soft);background:var(--navy-deep);border:1px solid var(--line);
+  border-radius:6px;padding:2px 7px}
+.foot{margin-top:26px;font-size:11.5px;color:var(--ink-mut);line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div class="wordmark"><span class="dot"></span>Sorak <b>LIVE</b></div>
+    <span class="kicker">世界杯 2026 · Demo 选型 · pick one</span>
+  </div>
+
+  <h1 class="title">三个公开方向,<span class="em">早上挑一个</span>。</h1>
+  <p class="lede">同一套<b>世界杯盘口引擎</b>(真钱彩池闪电盘 · CPMM 全场盘 · 免费积分场)+ <b>三语新闻模块</b>(中 / EN / BM),三种完全不同的外观。下面每张卡可直接打开 live demo,并附一个运营后台。</p>
+  <p class="subline">机制统一:<span>闪电盘=彩池派彩倍数</span> · <span>全场盘=美分即概率</span> · <span>IMDO 独立结算</span> · <span>负责任游戏冷却</span>。所有数据为 mock,仅演示。</p>
+
+  <div class="grid">
+
+    <!-- A -->
+    <a class="card" href="./a-stadium.html?lang=zh">
+      <div class="thumb t-a">
+        <span class="badge pub">公开 DEMO · A</span>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <span class="lett">A</span>
+          <div class="mini"><i style="--h:14px"></i><i style="--h:26px"></i><i style="--h:20px"></i><i style="--h:34px"></i><i style="--h:18px"></i></div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="name">Stadium<small>体育场夜场</small></div>
+        <p class="pitch">深色沉浸式<b style="color:var(--ink)">带盘直播主页</b>:左边球场直播画面 + 比分/解说,右边闪电盘下注轨,底下实况聊天 / 排行榜 / 诚信结算。最贴近"看球+下注"的主场景。</p>
+        <div class="feats"><span>带盘直播</span><span>闪电盘轨</span><span>实况聊天</span><span>桌面优先</span></div>
+        <div class="launch">
+          <span class="go">查看 A →</span>
+          <span class="lng"><a href="./a-stadium.html?lang=zh">中</a><a href="./a-stadium.html?lang=en">EN</a><a href="./a-stadium.html?lang=ms">BM</a></span>
+        </div>
+      </div>
+    </a>
+
+    <!-- B -->
+    <a class="card" href="./b-broadsheet.html?lang=zh">
+      <div class="thumb t-b">
+        <span class="badge pub">公开 DEMO · B</span>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <span class="lett">B</span>
+          <div style="width:120px">
+            <div class="formrow" style="width:90%"></div><div class="formrow" style="width:70%"></div>
+            <div class="formrow" style="width:80%"></div><div class="formrow" style="width:55%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="name">Royal Broadsheet<small>王室报刊</small></div>
+        <p class="pitch">浅色象牙<b style="color:var(--ink)">编辑部 / 报刊</b>风:大衬线报头 + 新闻头条领衔(主打 AI 新闻编辑室),盘口做成精致"赛事赔率表"。最显高级、最让人信任 — 适合给老板 / 投资人看。</p>
+        <div class="feats"><span>新闻领衔</span><span>编辑部气质</span><span>赔率表</span><span>浅色高级</span></div>
+        <div class="launch">
+          <span class="go">查看 B →</span>
+          <span class="lng"><a href="./b-broadsheet.html?lang=zh">中</a><a href="./b-broadsheet.html?lang=en">EN</a><a href="./b-broadsheet.html?lang=ms">BM</a></span>
+        </div>
+      </div>
+    </a>
+
+    <!-- C -->
+    <a class="card" href="./c-mobile.html?lang=zh">
+      <div class="thumb t-c">
+        <span class="badge pub">公开 DEMO · C</span>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <span class="lett">C</span>
+          <div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end">
+            <span class="pill">YES ≈2.1×</span><span class="pill">直播 · 盘口 · 新闻</span>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="name">Mobile Super-App<small>手机超级 App</small></div>
+        <p class="pitch">手机边框内的<b style="color:var(--ink)">社交信息流</b>:直播卡 + 内联闪电盘大按钮,全场盘横滑、新闻流、底部 Tab。最像 Sleeper / TikTok 的粉丝向 app,主打凌晨手机端 Mamak 场景。</p>
+        <div class="feats"><span>手机原生</span><span>社交信息流</span><span>2-tap 下注</span><span>Mamak 凌晨</span></div>
+        <div class="launch">
+          <span class="go">查看 C →</span>
+          <span class="lng"><a href="./c-mobile.html?lang=zh">中</a><a href="./c-mobile.html?lang=en">EN</a><a href="./c-mobile.html?lang=ms">BM</a></span>
+        </div>
+      </div>
+    </a>
+
+    <!-- Admin -->
+    <a class="card" href="./admin.html">
+      <div class="thumb t-admin">
+        <span class="badge adm">内部后台 · LIVE OPS</span>
+        <div style="display:flex;justify-content:space-between;align-items:flex-end">
+          <span class="lett">⚙</span>
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">
+            <span>HANDLE · RAKE</span><span>● POOL MONITOR</span><span>▲ EXPOSURE</span>
+          </div>
+        </div>
+      </div>
+      <div class="body">
+        <div class="name">Live Ops 控制台<small>运营后台</small></div>
+        <p class="pitch">持牌真钱世界杯闪电盘的<b style="color:var(--ink)">控制室</b>:实时盘口监控(封盘/作废/结算)、盘口生成 Copilot 人审双控、CPMM 持仓风险、courtsiding/mule 风控告警、KYC/AML/地域/RG 合规面板、抽水 P&L。</p>
+        <div class="feats"><span>盘口监控</span><span>Copilot 双控</span><span>风控告警</span><span>合规面板</span></div>
+        <div class="launch">
+          <span class="go" style="background:linear-gradient(180deg,#f0c074,var(--amber))">打开控制台 →</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- notes -->
+  <div class="notes">
+    <h3>三个 demo 共用的盘口机制(都是真的,不是装饰)</h3>
+    <div class="ngrid">
+      <div><h4>⚡ 闪电盘 · 真钱彩池(parimutuel)</h4><p>盲池,封盘前只显示<b style="color:var(--ink)">预计派彩倍数</b>(≈2.1×),不显示双方池;派彩=池×(1−抽水)/赢方注。庄家<b style="color:var(--ink)">无方向性风险</b>,只赚抽水 3–5%。封盘领先于最早信息;IMDO 独立结算;作废=全额退款。</p></div>
+      <div><h4>◎ 全场盘 · CPMM</h4><p>美分<b style="color:var(--ink)">即概率</b>(57¢=57%),随成交实时漂移 —— 不是彩池倍数。庄家做市,这里<b style="color:var(--ink)">才</b>承担持仓风险,后台有敞口/限额监控。</p></div>
+      <div><h4>◆ 免费积分场 + 三语 + 风控</h4><p>不能持牌的地区走<b style="color:var(--ink)">免费积分</b>(奖品=体验/周边,非现金)。中/EN/BM 一键切换;新闻模块来源/时间/关联球队;连续 6 盘自动冷却。</p></div>
+    </div>
+    <div class="path">
+      <div>📦 在线地址:<code>https://junai-lab.github.io/foresee-demo/wc/</code></div>
+      <div>💻 本地源码(可发微信文件传输):<code>~/foresee-site/wc/</code> &nbsp;— <code>a-stadium.html</code> · <code>b-broadsheet.html</code> · <code>c-mobile.html</code> · <code>admin.html</code> · 引擎 <code>wc-engine.js</code> + 数据 <code>wc-data.js</code></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    Sorak · 马来西亚(柔佛王室关联经纪)娱乐预测平台 · 世界杯方向。Demo 用 mock 数据演示机制与外观;真钱仅限持牌且 in-play 合法地区,其他地区为免费积分场。<br>
+    挑好一个方向后告诉我,我把它定为主线继续打磨(接真实新闻源、补市场详情/钱包/KYC 流、移动适配)。
+  </div>
+
+</div>
+</body>
+</html>

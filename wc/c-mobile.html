@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sorak · 世界杯 — Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================
+   SORAK · MOBILE SUPER-APP (Demo C)
+   Phone-framed social-feed experience
+   ========================================== */
+:root {
+  --navy:#16285C; --navy-deep:#0D1838; --navy-2:#1B2E66; --navy-3:#0a1226;
+  --gold:#C9A84C; --gold-deep:#A8842B; --gold-soft:#E7D499; --gold-glow:rgba(201,168,76,.22);
+  --yes:#1DCB86; --yes-bg:rgba(29,203,134,.12); --yes-border:rgba(29,203,134,.35);
+  --no:#FF5364; --no-bg:rgba(255,83,100,.12); --no-border:rgba(255,83,100,.35);
+  --amber:#E8A33C;
+  --ink:#F0EDF8; --ink-2:#c8c2de; --ink-mut:#8b85a8;
+  --line:rgba(201,168,76,.14); --line-2:rgba(255,255,255,.07);
+  --card:rgba(22,32,72,.82); --card-2:rgba(13,24,56,.6);
+  --pill-r:16px; --r-card:20px; --r-sm:12px;
+  --ff:"Inter","Noto Sans SC",system-ui,sans-serif;
+  --mono:"DM Mono",ui-monospace,monospace;
+  --serif:"DM Serif Display",serif;
+  --phone-w:390px; --phone-h:844px;
+  --tab-h:64px;
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0 }
+html { -webkit-font-smoothing:antialiased; scroll-behavior:smooth }
+
+/* ==========================================
+   BACKDROP — outer desktop shell
+   ========================================== */
+body {
+  min-height:100vh;
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:40px 20px 80px;
+  background:
+    radial-gradient(ellipse 700px 500px at 20% 10%, rgba(29,203,134,.08), transparent 55%),
+    radial-gradient(ellipse 800px 600px at 80% 80%, rgba(201,168,76,.10), transparent 55%),
+    radial-gradient(ellipse 500px 400px at 50% 50%, rgba(22,40,100,.5), transparent 70%),
+    #07101f;
+  font-family: var(--ff);
+  color: var(--ink);
+}
+
+/* ==========================================
+   PHONE FRAME
+   ========================================== */
+.phone-shell {
+  position:relative;
+  width: var(--phone-w);
+  height: var(--phone-h);
+  overflow:hidden;
+  display:flex; flex-direction:column;
+  border-radius: 44px;
+  background: var(--navy-3);
+  box-shadow:
+    0 0 0 1.5px rgba(201,168,76,.25),
+    0 0 0 3px rgba(13,24,56,.9),
+    0 0 0 4px rgba(201,168,76,.12),
+    0 40px 100px rgba(0,0,10,.7),
+    0 0 60px rgba(29,203,134,.05),
+    inset 0 0 0 1px rgba(255,255,255,.04);
+}
+
+/* notch / dynamic island */
+.phone-notch {
+  position:absolute; top:12px; left:50%; transform:translateX(-50%);
+  width:120px; height:34px; background:#000;
+  border-radius:20px; z-index:100;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.phone-notch .cam { width:10px; height:10px; border-radius:50%; background:#1a1a1a; border:1px solid #333 }
+.phone-notch .dot { width:6px; height:6px; border-radius:50%; background:#1a1a1a }
+
+/* status bar */
+.phone-status {
+  padding:16px 28px 0;
+  height:50px;
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:12px; font-weight:700; color:var(--ink-2);
+  position:relative; z-index:50;
+}
+.status-time { font-variant-numeric:tabular-nums }
+.status-icons { display:flex; gap:5px; align-items:center; font-size:11px }
+.status-icons .sig { width:16px; height:12px; display:flex; align-items:flex-end; gap:1.5px }
+.status-icons .sig span { background:var(--ink-2); border-radius:1px; width:3px }
+.status-icons .sig span:nth-child(1){height:4px}
+.status-icons .sig span:nth-child(2){height:7px}
+.status-icons .sig span:nth-child(3){height:10px}
+.status-icons .sig span:nth-child(4){height:12px}
+.batt { width:22px; height:12px; border:1.5px solid var(--ink-2); border-radius:3px; position:relative; }
+.batt::after { content:''; position:absolute; right:-5px; top:50%; transform:translateY(-50%); width:3px; height:6px; background:var(--ink-2); border-radius:0 2px 2px 0 }
+.batt-fill { position:absolute; inset:1.5px; border-radius:1px; background:var(--yes); width:75% }
+
+/* inner scroll viewport */
+.phone-inner {
+  position:relative;
+  flex:1 1 auto; min-height:0;
+  overflow-y:auto; overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scroll-snap-type: none;
+  /* hide scrollbar */
+  scrollbar-width:none;
+}
+.phone-inner::-webkit-scrollbar { display:none }
+
+/* ==========================================
+   STICKY APP BAR
+   ========================================== */
+.app-bar {
+  position:sticky; top:0; z-index:40;
+  background:rgba(10,18,38,.88);
+  backdrop-filter:blur(18px) saturate(180%);
+  border-bottom:1px solid var(--line);
+  padding:10px 16px;
+  display:flex; align-items:center; gap:10px;
+}
+.app-brand {
+  font-family:var(--serif);
+  font-size:20px; letter-spacing:.3px;
+  display:flex; align-items:center; gap:7px;
+  flex:1;
+}
+.app-brand .live-dot {
+  width:8px; height:8px; border-radius:50%; background:var(--no);
+  box-shadow:0 0 0 0 rgba(255,83,100,.6);
+  animation:pulse 1.6s infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow:0 0 0 0 rgba(255,83,100,.55) }
+  70%  { box-shadow:0 0 0 8px rgba(255,83,100,0) }
+  100% { box-shadow:0 0 0 0 rgba(255,83,100,0) }
+}
+.app-brand span { color:var(--gold); font-size:14px; font-weight:800; font-family:var(--ff); letter-spacing:1px }
+.app-bal {
+  display:flex; align-items:center; gap:6px;
+  background:var(--card-2); border:1px solid var(--line);
+  border-radius:10px; padding:5px 10px; font-size:12px;
+}
+.app-bal .diamond { color:var(--gold); font-size:11px }
+.app-bal .bal-num { font-family:var(--mono); font-weight:600 }
+.app-eng {
+  font-size:10px; font-weight:700; color:#1a120a;
+  background:var(--gold-soft); border-radius:6px; padding:2px 6px;
+}
+/* WCX hook */
+.wcx-eng { font-size:10px; font-weight:700; color:#1a120a; background:var(--gold-soft); border-radius:6px; padding:2px 6px }
+
+/* lang chips row */
+.lang-row {
+  display:flex; gap:7px; padding:10px 16px 4px;
+  overflow-x:auto; scrollbar-width:none;
+}
+.lang-row::-webkit-scrollbar { display:none }
+.lang-btn {
+  flex-shrink:0; font-size:12.5px; font-weight:700;
+  border:1.5px solid var(--line); border-radius:999px;
+  padding:5px 14px; color:var(--ink-mut); cursor:pointer;
+  background:none; font-family:var(--ff);
+  transition:.15s;
+}
+.lang-btn.on {
+  border-color:var(--gold); color:#1a120a;
+  background:linear-gradient(135deg,var(--gold-soft),var(--gold));
+}
+
+/* ==========================================
+   FEED SECTIONS
+   ========================================== */
+.feed { display:flex; flex-direction:column; gap:0 }
+
+/* section label */
+.feed-sec {
+  padding:14px 16px 8px;
+  font-size:11px; font-weight:800; letter-spacing:1.5px;
+  color:var(--ink-mut); text-transform:uppercase;
+  display:flex; align-items:center; gap:8px;
+}
+.feed-sec::after {
+  content:''; flex:1; height:1px; background:var(--line);
+}
+
+/* ==========================================
+   HERO LIVE CARD
+   ========================================== */
+.hero-card {
+  margin:0 12px 14px;
+  border-radius:var(--r-card);
+  background:linear-gradient(160deg,rgba(22,40,100,.9),rgba(10,18,38,.95));
+  border:1px solid var(--line);
+  overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,.4),0 0 0 0.5px rgba(201,168,76,.08) inset;
+}
+.hero-top {
+  padding:13px 14px 10px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.live-chip {
+  display:flex; align-items:center; gap:6px;
+  background:var(--no); color:#fff;
+  font-size:10.5px; font-weight:800; letter-spacing:1.2px;
+  padding:4px 10px; border-radius:6px;
+}
+.live-chip .d { width:6px; height:6px; border-radius:50%; background:#fff; animation:blink 1.3s infinite }
+@keyframes blink { 50%{opacity:.25} }
+.watching-count { font-size:11px; color:var(--ink-mut) }
+.watching-count .n { color:var(--ink-2); font-weight:600; font-family:var(--mono) }
+
+/* match identity row */
+.match-id {
+  padding:0 14px 12px;
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.match-team {
+  display:flex; flex-direction:column; align-items:center; gap:4px; flex:1;
+}
+.match-team .flag { font-size:32px; line-height:1 }
+.match-team .name { font-size:11px; font-weight:700; color:var(--ink-2) }
+.match-vs {
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  font-family:var(--mono);
+}
+.wcx-score { font-size:26px; font-weight:600; letter-spacing:2px; color:var(--ink) }
+.wcx-clock {
+  font-size:11px; font-weight:700; color:var(--yes);
+  background:var(--yes-bg); border-radius:5px; padding:2px 7px;
+}
+
+/* pitch canvas (compact) */
+.canvas-wrap {
+  position:relative; margin:0 14px 12px;
+  border-radius:14px; overflow:hidden;
+  background:#000; aspect-ratio:16/7;
+  border:1px solid rgba(255,255,255,.06);
+}
+.canvas-wrap .wcx-canvas { width:100%; height:100%; display:block }
+.wcx-goal {
+  display:none; position:absolute; inset:0;
+  align-items:center; justify-content:center;
+  background:radial-gradient(circle,rgba(201,168,76,.4),rgba(13,24,56,.7));
+  z-index:10;
+}
+.wcx-goal b {
+  font-family:var(--serif); font-size:48px; color:#fff;
+  text-shadow:0 4px 24px rgba(201,168,76,.9); animation:goalPop .5s;
+}
+@keyframes goalPop { from{transform:scale(.5);opacity:0} }
+.wcx-host {
+  display:none; position:absolute; left:50%; bottom:10px; transform:translateX(-50%);
+  background:var(--gold); color:#1a120a; font-weight:800; font-size:12px;
+  padding:7px 14px; border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.5); max-width:90%; text-align:center;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+
+/* mamak ribbon */
+.mamak-ribbon {
+  margin:0 14px 14px;
+  display:flex; align-items:center; gap:8px;
+  background:linear-gradient(90deg,rgba(201,168,76,.15),rgba(201,168,76,.05));
+  border:1px solid var(--line); border-radius:10px;
+  padding:7px 12px; font-size:11.5px; font-weight:700; color:var(--gold-soft);
+}
+.mamak-ribbon .emoji { font-size:14px }
+
+/* ==========================================
+   FLASH POOL (inside hero card / separate card below)
+   ========================================== */
+.pool-card {
+  margin:0 12px 14px;
+  border-radius:var(--r-card);
+  background:linear-gradient(160deg,rgba(22,40,100,.88),rgba(10,18,38,.95));
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.pool-card-head {
+  display:flex; align-items:center; gap:8px;
+  padding:11px 14px;
+  border-bottom:1px solid var(--line);
+  background:rgba(201,168,76,.04);
+}
+.pool-card-head .ttl { font-size:13px; font-weight:800; flex:1 }
+.pool-card-head .pari-tag {
+  font-size:10px; font-weight:700; color:var(--gold-soft);
+  border:1px solid var(--line); border-radius:5px; padding:2px 6px;
+}
+
+/* FSM pills */
+.wcx-fsm {
+  display:flex; gap:5px; padding:11px 14px 0;
+}
+.wcx-fsm [data-step] {
+  flex:1; text-align:center; font-size:10px; font-weight:700;
+  color:var(--ink-mut); padding:5px 2px;
+  border:1px solid var(--line); border-radius:7px;
+  transition:.15s;
+}
+.wcx-fsm [data-step].on {
+  color:#1a120a; background:linear-gradient(135deg,var(--gold-soft),var(--gold));
+  border-color:var(--gold);
+}
+
+/* question + ring row */
+.pool-q-row {
+  display:flex; gap:11px; align-items:flex-start;
+  padding:12px 14px 6px;
+}
+.ring-wrap { position:relative; width:52px; height:52px; flex-shrink:0 }
+.ring-wrap svg { transform:rotate(-90deg) }
+.wcx-ring-num {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:var(--mono); font-size:17px; font-weight:600;
+}
+.wcx-fq { font-size:14.5px; font-weight:700; line-height:1.35; flex:1 }
+.wcx-src {
+  font-size:10.5px; color:var(--ink-mut); margin:0 14px 10px;
+  display:flex; align-items:center; gap:4px;
+}
+.wcx-src::before { content:"◎"; color:var(--gold); font-size:11px }
+
+.blind-note {
+  font-size:10.5px; color:var(--ink-mut); margin:0 14px 10px; line-height:1.45; opacity:.8;
+}
+
+/* YES / NO side buttons — big and thumb-friendly */
+.sides-row {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  padding:0 14px 10px;
+}
+.wcx-side {
+  border:2px solid var(--line); border-radius:14px;
+  padding:13px 10px 11px; text-align:center;
+  background:var(--card-2); cursor:pointer;
+  transition:.15s; font-family:var(--ff);
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+.wcx-side .s-label { font-size:13px; font-weight:900; letter-spacing:.8px }
+.wcx-side[data-side="yes"] .s-label { color:var(--yes) }
+.wcx-side[data-side="no"] .s-label { color:var(--no) }
+.wcx-mult { font-family:var(--mono); font-size:22px; font-weight:600; color:var(--ink) }
+.wcx-heat { font-size:10px; color:var(--ink-mut); margin-top:1px }
+.wcx-side[data-side="yes"].on {
+  border-color:var(--yes); background:var(--yes-bg);
+  box-shadow:0 0 0 1px var(--yes), 0 4px 16px rgba(29,203,134,.15);
+}
+.wcx-side[data-side="no"].on {
+  border-color:var(--no); background:var(--no-bg);
+  box-shadow:0 0 0 1px var(--no), 0 4px 16px rgba(255,83,100,.15);
+}
+
+/* chips */
+.chips-row {
+  display:flex; gap:6px; padding:0 14px 10px; justify-content:space-between;
+}
+.wcx-chip {
+  flex:1; padding:9px 4px; border:1.5px solid var(--line); border-radius:10px;
+  font-size:13px; font-weight:700; font-family:var(--mono);
+  color:var(--ink-mut); cursor:pointer; background:none; transition:.15s;
+}
+.wcx-chip.on {
+  border-color:var(--gold); color:var(--ink);
+  background:rgba(201,168,76,.12);
+}
+
+/* payout preview */
+.wcx-potential {
+  font-size:12.5px; color:var(--ink-mut);
+  margin:0 14px 10px; min-height:18px;
+}
+.wcx-potential b { color:var(--gold-soft); font-family:var(--mono); font-size:15px }
+
+/* GO button */
+.wcx-go {
+  display:block; width:calc(100% - 28px); margin:0 14px 12px;
+  padding:14px; border-radius:14px; font-size:15px; font-weight:900;
+  background:linear-gradient(160deg,var(--gold-soft),var(--gold));
+  color:#1a120a; cursor:pointer; border:none; font-family:var(--ff);
+  letter-spacing:.3px;
+  box-shadow:0 6px 24px rgba(201,168,76,.3);
+  transition:.15s;
+}
+.wcx-go:active { transform:scale(.97) }
+.wcx-go:disabled { opacity:.45; filter:grayscale(.4); box-shadow:none }
+
+/* state banner */
+.wcx-state {
+  display:none; margin:0 14px 12px;
+  padding:10px 12px; border-radius:12px;
+  font-weight:700; font-size:13.5px; text-align:center;
+}
+.wcx-state.win  { background:var(--yes-bg); color:var(--yes); border:1px solid var(--yes-border) }
+.wcx-state.lose { background:var(--no-bg); color:var(--no); border:1px solid var(--no-border) }
+.wcx-state.lock { background:rgba(201,168,76,.1); color:var(--gold-soft); border:1px solid var(--line) }
+
+/* RG meter */
+.rg-section {
+  padding:10px 14px 12px;
+  border-top:1px solid var(--line);
+  font-size:11px; color:var(--ink-mut);
+}
+.rg-track {
+  height:4px; background:rgba(255,255,255,.07);
+  border-radius:999px; overflow:hidden; margin:6px 0 4px;
+}
+.wcx-rgbar {
+  height:100%; width:0; transition:width .4s;
+  background:linear-gradient(90deg,var(--yes),var(--gold));
+}
+
+/* cooldown overlay */
+.wcx-cool {
+  display:none; padding:28px 16px 24px; text-align:center;
+}
+.wcx-cool .cool-title {
+  font-size:16px; font-weight:800; color:var(--gold-soft); margin-bottom:6px;
+}
+.wcx-cd {
+  font-family:var(--mono); font-size:44px; color:var(--gold);
+  display:block; margin:8px 0 6px;
+}
+.wcx-cool .cool-sub { font-size:11px; color:var(--ink-mut) }
+
+/* ==========================================
+   FULL-MATCH CPMM STRIP (horizontal scroll)
+   ========================================== */
+.fm-strip {
+  display:flex; gap:10px;
+  padding:4px 16px 14px;
+  overflow-x:auto; scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.fm-strip::-webkit-scrollbar { display:none }
+.wc-mcard {
+  flex-shrink:0; width:200px;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--r-sm); padding:13px;
+  cursor:pointer; transition:.15s;
+}
+.wc-mcard:active { transform:scale(.97) }
+.wc-mq { font-size:12.5px; font-weight:700; line-height:1.3; min-height:36px; color:var(--ink-2) }
+.wc-mrow {
+  display:flex; align-items:baseline; gap:6px;
+  margin:8px 0 10px; flex-wrap:wrap;
+}
+.wc-cents { font-family:var(--mono); font-weight:600 }
+.wc-cents.big { font-size:28px; color:var(--gold-soft) }
+.wc-cents.sm { font-size:14px; color:var(--gold-soft) }
+.wc-clab { font-size:10px; color:var(--ink-mut) }
+.wc-chg { font-size:11px; font-weight:700; font-family:var(--mono) }
+.wc-chg.up   { color:var(--yes) }
+.wc-chg.down { color:var(--no) }
+.wc-chg.flat { color:var(--ink-mut) }
+.wc-vol { font-size:10px; color:var(--ink-mut); font-family:var(--mono); margin-top:1px; display:block }
+.wc-duo { display:grid; grid-template-columns:1fr 1fr; gap:5px }
+.wc-pill {
+  padding:7px; border-radius:8px;
+  font-size:11px; font-weight:700; font-family:var(--mono);
+  border:1px solid var(--line); cursor:pointer; transition:.13s;
+}
+.wc-pill.yes { color:var(--yes); background:var(--yes-bg) }
+.wc-pill.no  { color:var(--no); background:var(--no-bg) }
+.wc-pill:active { transform:scale(.95) }
+
+/* ==========================================
+   NEWS FEED — stacked social cards
+   ========================================== */
+.news-feed { display:flex; flex-direction:column; gap:10px; padding:0 12px 14px }
+.wc-news {
+  display:flex; gap:11px;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--r-sm); overflow:hidden;
+  text-decoration:none; color:inherit; cursor:pointer;
+  transition:.15s;
+}
+.wc-news:active { transform:scale(.98) }
+.wc-news-thumb {
+  width:80px; min-height:80px; flex-shrink:0;
+  display:flex; align-items:flex-end; padding:7px;
+}
+.wc-news-flags { font-size:20px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.6)) }
+.wc-news-body { padding:10px 11px 10px 0; display:flex; flex-direction:column; gap:4px; flex:1 }
+.wc-news-src { font-size:10.5px; color:var(--gold-soft); font-weight:700 }
+.wc-news-title { font-size:13px; font-weight:700; line-height:1.35; color:var(--ink-2) }
+.wc-news-tags { display:flex; gap:5px; flex-wrap:wrap; margin-top:3px }
+.wc-news-tags span {
+  font-size:10px; color:var(--ink-mut);
+  border:1px solid var(--line); border-radius:5px; padding:1px 6px;
+}
+
+/* ==========================================
+   CHAMPION + GROUPS + KNOCKOUT LIST CARDS
+   ========================================== */
+.list-section { padding:0 12px 14px }
+.list-card {
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--r-card); overflow:hidden;
+}
+.list-card + .list-card { margin-top:10px }
+.list-card-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:11px 13px;
+  background:rgba(201,168,76,.04);
+  border-bottom:1px solid var(--line);
+  font-size:12px; font-weight:800; color:var(--gold-soft);
+  cursor:pointer; user-select:none;
+}
+.list-card-head .chevron { font-size:11px; color:var(--ink-mut); transition:.2s }
+.list-card-body { overflow:hidden; transition:max-height .3s ease }
+.list-card-body.collapsed { max-height:0 }
+.wc-row {
+  display:flex; align-items:center; gap:9px;
+  padding:9px 13px; border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.wc-row:last-child { border:none }
+.wc-rank { width:18px; color:var(--ink-mut); font-family:var(--mono); font-size:12px }
+.wc-team { display:flex; align-items:center; gap:6px; font-weight:600; flex:1 }
+.wc-flag { font-size:16px }
+.wc-row .wc-cents { margin-left:auto }
+.wc-mini-buy {
+  font-size:11px; font-weight:700; color:#1a120a;
+  background:var(--gold-soft); border-radius:6px; padding:4px 9px;
+  cursor:pointer; border:none; font-family:var(--ff);
+}
+.wc-grp-h { font-size:11px; font-weight:700; color:var(--ink-mut); padding:8px 13px 2px }
+.wc-grow-lab { font-size:10.5px; color:var(--ink-mut); flex-shrink:0 }
+.wc-ko-stage { font-size:11px; color:var(--ink-mut); margin-left:auto }
+.wc-grp { margin-bottom:4px }
+
+/* ==========================================
+   LIVE CHAT CARD
+   ========================================== */
+.chat-card {
+  margin:0 12px 14px;
+  background:var(--card); border:1px solid var(--line);
+  border-radius:var(--r-card); overflow:hidden;
+}
+.chat-card-head {
+  display:flex; align-items:center; gap:7px;
+  padding:11px 14px;
+  border-bottom:1px solid var(--line);
+  font-size:12px; font-weight:800; color:var(--ink-2);
+}
+.chat-live-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--no);
+  animation:pulse 1.6s infinite;
+}
+.wcx-chat {
+  height:160px; overflow-y:auto; padding:10px 14px;
+  display:flex; flex-direction:column; gap:5px;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;
+}
+.wcx-chat::-webkit-scrollbar { display:none }
+.wcx-msg {
+  padding:4px 9px; background:rgba(255,255,255,.04);
+  border-radius:8px; font-size:12px; line-height:1.35;
+  color:var(--ink-2);
+}
+.wcx-msg b { color:var(--gold-soft); font-weight:700; margin-right:4px }
+
+/* ==========================================
+   BOTTOM TAB BAR
+   ========================================== */
+.tab-bar {
+  position:relative; flex:0 0 auto; z-index:50;
+  height:var(--tab-h); background:rgba(8,14,36,.95);
+  backdrop-filter:blur(18px) saturate(180%);
+  border-top:1px solid var(--line);
+  display:flex; align-items:stretch;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.tab-btn {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:3px; cursor:pointer;
+  border:none; background:none; font-family:var(--ff); color:var(--ink-mut);
+  font-size:10px; font-weight:700; padding:0;
+  transition:.15s;
+}
+.tab-btn .tab-icon { font-size:18px; line-height:1; transition:.15s }
+.tab-btn.on { color:var(--gold) }
+.tab-btn.on .tab-icon { transform:scale(1.1) }
+.tab-btn:active { opacity:.7 }
+
+/* ==========================================
+   DEMO SWITCHER (outside phone, backdrop)
+   ========================================== */
+.demo-switch {
+  position:fixed; right:16px; bottom:16px; z-index:100;
+  display:flex; flex-direction:column; gap:7px; align-items:flex-end;
+}
+.demo-switch a {
+  font-size:12px; font-weight:700; font-family:var(--ff);
+  background:rgba(22,40,100,.9); border:1px solid var(--gold);
+  color:var(--gold-soft); padding:8px 13px; border-radius:10px;
+  text-decoration:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  transition:.15s;
+}
+.demo-switch a:hover { background:rgba(201,168,76,.2) }
+
+/* ==========================================
+   TOAST
+   ========================================== */
+.wcx-toast {
+  position:fixed; left:50%; bottom:80px; transform:translateX(-50%) translateY(16px);
+  background:var(--navy-2); border:1px solid var(--gold); color:var(--ink);
+  padding:10px 18px; border-radius:12px; font-weight:700; font-size:13px;
+  opacity:0; pointer-events:none; z-index:200;
+  transition:opacity .25s, transform .25s;
+  box-shadow:0 12px 40px rgba(0,0,0,.5); white-space:nowrap;
+}
+.wcx-toast.on { opacity:1; transform:translateX(-50%) translateY(0) }
+
+/* ==========================================
+   RESPONSIVE: full-screen on real phone
+   ========================================== */
+@media (max-width:480px) {
+  body {
+    display:block; padding:0; background:#0a1226;
+    /* keep ambient but simpler on small screen */
+    background:
+      radial-gradient(ellipse 400px 300px at 80% 10%, rgba(201,168,76,.08), transparent),
+      #07101f;
+  }
+  .phone-shell {
+    width:100%; height:100dvh; border-radius:0;
+    box-shadow:none;
+  }
+  .phone-notch { display:none }
+  .phone-status { padding:10px 20px 0; height:44px }
+  .phone-inner { flex:1 }
+  .demo-switch { display:none }
+}
+
+/* smooth scrollIntoView offset for sticky header */
+[id] { scroll-margin-top:60px }
+</style>
+</head>
+<body>
+
+<!-- ====================== PHONE FRAME ====================== -->
+<div class="phone-shell" id="phone">
+
+  <!-- Dynamic Island / notch -->
+  <div class="phone-notch">
+    <div class="cam"></div>
+    <div class="dot"></div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="phone-status">
+    <span class="status-time">3:07</span>
+    <div class="status-icons">
+      <div class="sig">
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <span style="font-size:10px">5G</span>
+      <div class="batt"><div class="batt-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Scrollable inner -->
+  <div class="phone-inner" id="scroll-root">
+
+    <!-- ===== APP BAR ===== -->
+    <div class="app-bar">
+      <div class="app-brand">
+        <span class="live-dot"></span>
+        <span style="font-family:var(--serif);font-size:20px;color:var(--ink)">Sorak</span>
+        <span>LIVE</span>
+      </div>
+      <div class="app-bal">
+        <span class="diamond">◆</span>
+        <span class="bal-num wcx-bal">1,000</span>
+        <span class="wcx-eng">免费积分</span>
+      </div>
+    </div>
+
+    <!-- ===== LANGUAGE CHIPS ===== -->
+    <div class="lang-row" id="lang-row">
+      <button class="lang-btn" data-l="zh">中文</button>
+      <button class="lang-btn" data-l="en">English</button>
+      <button class="lang-btn" data-l="ms">BM</button>
+    </div>
+
+    <!-- ===== FEED ===== -->
+    <div class="feed">
+
+      <!-- ─── SECTION: LIVE ─── -->
+      <div id="sec-live"></div><!-- anchor -->
+      <div class="feed-sec"><span data-t="nav_live">直播</span></div>
+
+      <!-- Hero match card -->
+      <div class="hero-card">
+        <div class="hero-top">
+          <div class="live-chip"><span class="d"></span><span data-t="live_now">直播中</span></div>
+          <div class="watching-count">
+            👁 <span class="n">38,402</span> <span data-t="watching">人在看</span>
+          </div>
+        </div>
+
+        <!-- Match identity -->
+        <div class="match-id">
+          <div class="match-team">
+            <span class="flag" id="m-home-flag">🇧🇷</span>
+            <span class="name" id="m-home-name">巴西</span>
+          </div>
+          <div class="match-vs">
+            <span class="wcx-score">0 : 0</span>
+            <span class="wcx-clock">12'</span>
+          </div>
+          <div class="match-team">
+            <span class="flag" id="m-away-flag">🇦🇷</span>
+            <span class="name" id="m-away-name">阿根廷</span>
+          </div>
+        </div>
+
+        <!-- Pitch canvas -->
+        <div class="canvas-wrap">
+          <canvas class="wcx-canvas" width="960" height="540"></canvas>
+          <div class="wcx-goal"><b>GOAL</b></div>
+          <div class="wcx-host"></div>
+        </div>
+
+        <!-- Mamak ribbon -->
+        <div class="mamak-ribbon">
+          <span class="emoji">🍵</span>
+          <span data-t="mamak">Mamak Mode · 陪你熬夜看球</span>
+        </div>
+      </div>
+
+      <!-- ─── SECTION: MARKETS / FLASH POOL ─── -->
+      <div id="sec-markets"></div>
+      <div class="feed-sec"><span data-t="nav_markets">盘口</span></div>
+
+      <!-- Flash pool card -->
+      <div class="pool-card">
+        <div class="pool-card-head">
+          <span class="ttl" data-t="sec_flash">闪电盘 · 直播中</span>
+          <span class="pari-tag" data-t="pari">彩池制</span>
+          <span class="wcx-eng">免费积分</span>
+        </div>
+
+        <!-- Pool body -->
+        <div class="wcx-pool">
+          <!-- FSM steps -->
+          <div class="wcx-fsm">
+            <span data-step data-t="fsm_open">投注中</span>
+            <span data-step data-t="fsm_lock">已锁</span>
+            <span data-step data-t="fsm_prov">临时</span>
+            <span data-step data-t="fsm_official">官方</span>
+          </div>
+
+          <!-- Question + ring countdown -->
+          <div class="pool-q-row">
+            <div class="ring-wrap">
+              <svg width="52" height="52" viewBox="0 0 52 52">
+                <circle cx="26" cy="26" r="21" fill="none" stroke="rgba(201,168,76,.16)" stroke-width="5"/>
+                <circle class="wcx-ring-fg" cx="26" cy="26" r="21" fill="none"
+                  stroke="#C9A84C" stroke-width="5" stroke-linecap="round"
+                  stroke-dasharray="131.9" stroke-dashoffset="0"/>
+              </svg>
+              <span class="wcx-ring-num">20</span>
+            </div>
+            <div class="wcx-fq">—</div>
+          </div>
+
+          <div class="wcx-src"></div>
+          <div class="blind-note" data-t="blind_pool">盲池:封盘前只显示预计派彩</div>
+
+          <!-- YES / NO buttons -->
+          <div class="sides-row">
+            <button class="wcx-side" data-side="yes">
+              <span class="s-label" data-t="yes">YES</span>
+              <span class="wcx-mult">≈—×</span>
+              <span class="wcx-heat"></span>
+            </button>
+            <button class="wcx-side" data-side="no">
+              <span class="s-label" data-t="no">NO</span>
+              <span class="wcx-mult">≈—×</span>
+              <span class="wcx-heat"></span>
+            </button>
+          </div>
+
+          <!-- Amount chips -->
+          <div class="chips-row">
+            <button class="wcx-chip on" data-amt="50">50</button>
+            <button class="wcx-chip" data-amt="100">100</button>
+            <button class="wcx-chip" data-amt="250">250</button>
+            <button class="wcx-chip" data-amt="500">500</button>
+          </div>
+
+          <!-- Payout preview -->
+          <div class="wcx-potential" data-t="pick_side">选边后显示预计派彩</div>
+
+          <!-- Go button -->
+          <button class="wcx-go">下注 50 积分</button>
+
+          <!-- Result state -->
+          <div class="wcx-state"></div>
+        </div><!-- /.wcx-pool -->
+
+        <!-- Cooldown overlay -->
+        <div class="wcx-cool">
+          <div class="cool-title" data-t="cooldown_t">歇一歇,喝杯 teh tarik</div>
+          <span class="wcx-cd">12</span>
+          <div class="cool-sub" data-t="rg_cool">连续 6 盘后自动冷却</div>
+        </div>
+
+        <!-- RG meter -->
+        <div class="rg-section">
+          <div data-t="rg_title">负责任游戏</div>
+          <div class="rg-track"><div class="wcx-rgbar"></div></div>
+          <div class="wcx-rgtxt">本场 <span class="wcx-played">0</span>/12 · <span data-t="rg_cool">连续 6 盘后自动冷却</span></div>
+        </div>
+      </div><!-- /.pool-card -->
+
+      <!-- Settlement source -->
+      <div style="padding:0 16px 14px;font-size:11px;color:var(--ink-mut);display:flex;align-items:center;gap:6px">
+        <span style="color:var(--gold)">🛡</span>
+        <span data-t="imdo">结算依据独立现场数据官(IMDO)</span>
+      </div>
+
+      <!-- ─── Full-match CPMM strip ─── -->
+      <div style="padding:0 16px 8px;font-size:11px;font-weight:800;color:var(--ink-mut);letter-spacing:1px;display:flex;align-items:center;gap:8px;text-transform:uppercase">
+        <span data-t="sec_fullmatch">全场盘</span>
+        <span style="flex:1;height:1px;background:var(--line)"></span>
+        <span style="font-size:10px;font-weight:600;color:var(--ink-mut)" data-t="cpmm_note">美分=概率</span>
+      </div>
+      <div class="fm-strip" id="fm"></div>
+
+      <!-- ─── SECTION: NEWS ─── -->
+      <div id="sec-news"></div>
+      <div class="feed-sec"><span data-t="nav_news">新闻</span></div>
+
+      <div class="news-feed" id="news"></div>
+
+      <!-- ─── Champion / Groups / Knockout ─── -->
+      <div class="feed-sec"><span data-t="sec_champion">冠军盘</span></div>
+      <div class="list-section">
+        <!-- Champion -->
+        <div class="list-card" id="card-champ">
+          <div class="list-card-head" onclick="toggleCard('champ')">
+            <span data-t="sec_champion">冠军盘</span>
+            <span class="chevron" id="chev-champ">▾</span>
+          </div>
+          <div class="list-card-body" id="body-champ" style="max-height:999px">
+            <div id="champ"></div>
+          </div>
+        </div>
+        <!-- Groups -->
+        <div class="list-card" id="card-groups">
+          <div class="list-card-head" onclick="toggleCard('groups')">
+            <span data-t="sec_groups">小组出线</span>
+            <span class="chevron" id="chev-groups">▾</span>
+          </div>
+          <div class="list-card-body" id="body-groups" style="max-height:999px">
+            <div id="groups"></div>
+          </div>
+        </div>
+        <!-- Knockout -->
+        <div class="list-card" id="card-ko">
+          <div class="list-card-head" onclick="toggleCard('ko')">
+            <span data-t="sec_knockout">淘汰赛晋级</span>
+            <span class="chevron" id="chev-ko">▾</span>
+          </div>
+          <div class="list-card-body" id="body-ko" style="max-height:999px">
+            <div id="ko"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── SECTION: WALLET (chat + stats) ─── -->
+      <div id="sec-wallet"></div>
+      <div class="feed-sec"><span data-t="nav_wallet">钱包</span></div>
+
+      <!-- Live chat card -->
+      <div class="chat-card">
+        <div class="chat-card-head">
+          <span class="chat-live-dot"></span>
+          <span id="chat-lab">实况聊天</span>
+        </div>
+        <div class="wcx-chat"></div>
+      </div>
+
+      <!-- Wallet summary card -->
+      <div style="margin:0 12px 20px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <span style="font-size:13px;font-weight:800;color:var(--gold-soft)" data-t="nav_wallet">钱包</span>
+          <span class="app-eng" data-t="free_badge">免费积分场</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px">
+            <div style="font-size:10px;color:var(--ink-mut);margin-bottom:4px" data-t="nav_wallet">余额</div>
+            <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:var(--gold-soft)">◆ <span class="wcx-bal">1,000</span></div>
+          </div>
+          <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:12px">
+            <div style="font-size:10px;color:var(--ink-mut);margin-bottom:4px" data-t="streak">连胜</div>
+            <div style="font-family:var(--mono);font-size:20px;font-weight:600;color:var(--yes)"><span class="wcx-streak">×0</span></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;font-size:11px;color:var(--ink-mut);line-height:1.6" data-t="region_note">真钱仅限持牌且 in-play 合法地区;其他地区为免费积分场。</div>
+      </div>
+
+    </div><!-- /.feed -->
+  </div><!-- /.phone-inner -->
+
+  <!-- ===== BOTTOM TAB BAR (flex sibling, pinned) ===== -->
+  <div class="tab-bar">
+      <button class="tab-btn on" id="tab-live" onclick="scrollTo('sec-live','tab-live')">
+        <span class="tab-icon">📺</span>
+        <span data-t="nav_live">直播</span>
+      </button>
+      <button class="tab-btn" id="tab-markets" onclick="scrollTo('sec-markets','tab-markets')">
+        <span class="tab-icon">⚡</span>
+        <span data-t="nav_markets">盘口</span>
+      </button>
+      <button class="tab-btn" id="tab-news" onclick="scrollTo('sec-news','tab-news')">
+        <span class="tab-icon">📰</span>
+        <span data-t="nav_news">新闻</span>
+      </button>
+      <button class="tab-btn" id="tab-wallet" onclick="scrollTo('sec-wallet','tab-wallet')">
+        <span class="tab-icon">💎</span>
+        <span data-t="nav_wallet">钱包</span>
+      </button>
+    </div>
+</div><!-- /.phone-shell -->
+
+<!-- ===== DEMO SWITCHER (backdrop, outside phone) ===== -->
+<div class="demo-switch">
+  <a href="./index.html">← 挑选</a>
+  <a href="./a-stadium.html">A</a>
+  <a href="./b-broadsheet.html">B</a>
+</div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="./wc-data.js"></script>
+<script src="./wc-engine.js"></script>
+<script>
+(function () {
+  var W = window.WC;
+  var E = window.WCEngine;
+  var lang = E.langFromUrl();
+
+  /* ── Extra i18n not in the dict ── */
+  var EX = {
+    cpmm_note: { zh: '美分=概率,随成交漂移', en: 'Cents = probability, drifts with trades', ms: 'Sen = peluang, berubah ikut dagangan' },
+    chat_live: { zh: '实况聊天', en: 'Live chat', ms: 'Sembang langsung' },
+    balance:   { zh: '余额', en: 'Balance', ms: 'Baki' },
+    streak:    { zh: '连胜', en: 'Streak', ms: 'Berturut' },
+    wallet:    { zh: '余额', en: 'Balance', ms: 'Baki' },
+  };
+
+  /* ── Apply static i18n ── */
+  function applyStatic() {
+    document.documentElement.lang = lang === 'zh' ? 'zh' : lang;
+    document.querySelectorAll('[data-t]').forEach(function (el) {
+      var k = el.getAttribute('data-t');
+      var v = W.t(k, lang);
+      if (v && v !== k) el.textContent = v;
+    });
+    /* extra keys */
+    document.querySelectorAll('[data-t]').forEach(function (el) {
+      var k = el.getAttribute('data-t');
+      if (EX[k]) el.textContent = W.L(EX[k], lang);
+    });
+    /* lang chip active state */
+    document.querySelectorAll('#lang-row .lang-btn').forEach(function (b) {
+      b.classList.toggle('on', b.dataset.l === lang);
+    });
+    /* chat section label */
+    var cl = document.getElementById('chat-lab');
+    if (cl) cl.textContent = W.L(EX.chat_live, lang);
+    /* match hero */
+    var m = W.MATCH;
+    var h = W.TEAM[m.home], a = W.TEAM[m.away];
+    document.getElementById('m-home-flag').textContent = h.flag;
+    document.getElementById('m-home-name').textContent = h[lang] || h.en;
+    document.getElementById('m-away-flag').textContent = a.flag;
+    document.getElementById('m-away-name').textContent = a[lang] || a.en;
+  }
+
+  /* ── Render lists ── */
+  function renderLists() {
+    document.getElementById('fm').innerHTML = E.renderFullmatch(lang);
+    document.getElementById('champ').innerHTML = E.renderChampion(lang);
+    document.getElementById('groups').innerHTML = E.renderGroups(lang);
+    document.getElementById('ko').innerHTML = E.renderKnockout(lang);
+    document.getElementById('news').innerHTML = E.renderNews(lang);
+  }
+
+  /* ── Lang toggle ── */
+  document.getElementById('lang-row').addEventListener('click', function (e) {
+    var b = e.target.closest('.lang-btn'); if (!b) return;
+    localStorage.setItem('wc-lang', b.dataset.l);
+    var u = new URL(location.href);
+    u.searchParams.set('lang', b.dataset.l);
+    location.href = u.toString();
+  });
+
+  /* ── Tab navigation ── */
+  window.scrollTo = function (secId, tabId) {
+    /* highlight tab */
+    document.querySelectorAll('.tab-btn').forEach(function (t) {
+      t.classList.toggle('on', t.id === tabId);
+    });
+    /* scroll inside phone */
+    var el = document.getElementById(secId);
+    var inner = document.getElementById('scroll-root');
+    if (!el || !inner) return;
+    var elRect = el.getBoundingClientRect();
+    var innerRect = inner.getBoundingClientRect();
+    inner.scrollBy({ top: elRect.top - innerRect.top - 60, behavior: 'smooth' });
+  };
+
+  /* ── mini-buy + CPMM pills → demo toast ── */
+  document.body.addEventListener('click', function (e) {
+    if (e.target.closest('.wc-mini-buy') || e.target.closest('.wc-pill')) {
+      E.toast(document.body, W.L({ zh: 'Demo:下单走全场盘页', en: 'Demo: opens full-match page', ms: 'Demo: buka halaman penuh' }, lang));
+    }
+  });
+
+  /* ── Collapsible list cards ── */
+  window.toggleCard = function (key) {
+    var body = document.getElementById('body-' + key);
+    var chev = document.getElementById('chev-' + key);
+    if (!body) return;
+    var collapsed = body.classList.toggle('collapsed');
+    if (chev) chev.textContent = collapsed ? '▸' : '▾';
+    if (!collapsed) body.style.maxHeight = '999px';
+    else body.style.maxHeight = '0';
+  };
+
+  /* ── Highlight active tab on scroll ── */
+  var sections = [
+    { id: 'sec-live',    tab: 'tab-live' },
+    { id: 'sec-markets', tab: 'tab-markets' },
+    { id: 'sec-news',    tab: 'tab-news' },
+    { id: 'sec-wallet',  tab: 'tab-wallet' },
+  ];
+  var inner = document.getElementById('scroll-root');
+  if (inner) {
+    inner.addEventListener('scroll', function () {
+      var scrollTop = inner.scrollTop + 100;
+      var active = sections[0].tab;
+      sections.forEach(function (s) {
+        var el = document.getElementById(s.id);
+        if (el && el.offsetTop <= scrollTop) active = s.tab;
+      });
+      document.querySelectorAll('.tab-btn').forEach(function (t) {
+        t.classList.toggle('on', t.id === active);
+      });
+    }, { passive: true });
+  }
+
+  /* ── Go ── */
+  applyStatic();
+  renderLists();
+  E.flash(document.body, lang);
+})();
+</script>
+</body>
+</html>

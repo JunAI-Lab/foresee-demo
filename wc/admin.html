@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sorak · Admin / Live Ops Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#16285C;--navy-deep:#0D1838;--navy-2:#1B2E66;--gold:#C9A84C;--gold-deep:#A8842B;
+  --gold-soft:#E7D499;--cream:#F4F1E8;--yes:#1DCB86;--no:#FF5364;--pitch:#0d5a2f;
+  --ink:#EAE6F2;--ink-mut:#9aa0c4;--line:rgba(201,168,76,.18);--card:#141d3f;--card-2:#101731;
+  --amber:#E8A33C;--red-bg:rgba(255,83,100,.12);--yes-bg:rgba(29,203,134,.12);
+  --amber-bg:rgba(232,163,60,.12);--gold-bg:rgba(201,168,76,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy-deep);color:var(--ink);
+  font-family:"Schibsted Grotesk","Noto Sans SC",system-ui,sans-serif;
+  font-size:13px;-webkit-font-smoothing:antialiased;min-height:100vh}
+.mono{font-family:"DM Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.serif{font-family:"DM Serif Display",serif}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--navy-deep)}
+::-webkit-scrollbar-thumb{background:var(--navy-2);border-radius:3px}
+
+/* ============ TOP STATUS BAR ============ */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:linear-gradient(180deg,rgba(13,24,56,.98),rgba(13,24,56,.93));
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+  padding:0 18px;
+}
+.topbar-inner{
+  display:flex;align-items:center;gap:14px;height:52px;
+  max-width:1800px;margin:0 auto;
+}
+.wordmark{font-family:"DM Serif Display",serif;font-size:20px;letter-spacing:.3px;
+  color:var(--gold);white-space:nowrap;display:flex;align-items:center;gap:8px}
+.wordmark .sub{font-family:"Schibsted Grotesk",sans-serif;font-size:10px;
+  font-weight:700;letter-spacing:2px;color:var(--ink-mut);text-transform:uppercase;margin-top:2px}
+.divider-v{width:1px;height:32px;background:var(--line);flex-shrink:0}
+.match-pill{display:flex;align-items:center;gap:10px;background:var(--card-2);
+  border:1px solid var(--line);border-radius:10px;padding:5px 12px;gap:10px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--no);flex-shrink:0;
+  box-shadow:0 0 0 0 rgba(255,83,100,.6);animation:pp 1.4s infinite}
+@keyframes pp{0%{box-shadow:0 0 0 0 rgba(255,83,100,.55)}70%{box-shadow:0 0 0 8px rgba(255,83,100,0)}100%{box-shadow:0 0 0 0 rgba(255,83,100,0)}}
+.match-name{font-weight:700;font-size:14px}
+.match-meta{color:var(--ink-mut);font-size:11px}
+.match-clock{font-family:"DM Mono",monospace;font-size:15px;font-weight:500;
+  color:var(--yes);background:var(--yes-bg);padding:2px 8px;border-radius:6px}
+.feed-block{display:flex;flex-direction:column;gap:2px;padding:4px 10px;
+  border-left:1px solid var(--line)}
+.feed-label{font-size:10px;color:var(--ink-mut);letter-spacing:.5px;text-transform:uppercase}
+.feed-status{display:flex;align-items:center;gap:6px;font-family:"DM Mono",monospace;font-size:12px}
+.feed-ok{color:var(--yes)}
+.feed-ts{color:var(--gold-soft);font-size:11px}
+.delay-block{display:flex;flex-direction:column;gap:2px;padding:4px 10px;border-left:1px solid var(--line)}
+.delay-val{font-family:"DM Mono",monospace;color:var(--amber);font-size:13px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.op-chip{display:flex;align-items:center;gap:6px;padding:4px 10px;
+  border:1px solid var(--line);border-radius:8px;background:var(--gold-bg);font-size:12px}
+.op-dot{width:8px;height:8px;border-radius:50%;background:var(--yes)}
+.suspend-btn{
+  display:flex;align-items:center;gap:7px;
+  background:var(--no);color:#fff;border-radius:9px;padding:7px 16px;
+  font-weight:800;font-size:13px;letter-spacing:.3px;
+  box-shadow:0 0 20px rgba(255,83,100,.35);
+  transition:all .15s;white-space:nowrap;
+}
+.suspend-btn:hover{background:#e03a4a;box-shadow:0 0 28px rgba(255,83,100,.55);transform:translateY(-1px)}
+.suspend-btn.active{background:#7a1122;box-shadow:none;animation:none}
+
+/* ============ LAYOUT ============ */
+.page{max-width:1800px;margin:0 auto;padding:14px 18px 80px}
+.grid-main{display:grid;grid-template-columns:1fr 340px;gap:14px;align-items:start}
+.grid-left{display:flex;flex-direction:column;gap:14px}
+.grid-right{display:flex;flex-direction:column;gap:14px}
+
+/* ============ SECTION CARD ============ */
+.card{background:var(--navy);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card-head{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(90deg,rgba(201,168,76,.08),transparent);
+}
+.card-title{font-weight:700;font-size:13px;color:var(--gold);letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+.card-meta{color:var(--ink-mut);font-size:11px;margin-left:auto;display:flex;align-items:center;gap:8px}
+
+/* ============ STATE BADGES ============ */
+.badge{display:inline-flex;align-items:center;gap:4px;border-radius:5px;padding:2px 7px;
+  font-size:10.5px;font-weight:700;letter-spacing:.3px;white-space:nowrap}
+.badge-open{background:var(--yes-bg);color:var(--yes);border:1px solid rgba(29,203,134,.25)}
+.badge-lock{background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.3)}
+.badge-prov{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(232,163,60,.3)}
+.badge-official{background:rgba(100,120,200,.15);color:#8fa8ff;border:1px solid rgba(100,120,200,.3)}
+.badge-void{background:rgba(150,150,150,.12);color:#888;border:1px solid rgba(150,150,150,.2);text-decoration:line-through}
+.badge-pending{background:rgba(232,163,60,.1);color:var(--amber);border:1px solid rgba(232,163,60,.2)}
+
+/* ============ LIVE POOL MONITOR ============ */
+.pool-table{width:100%;border-collapse:collapse;font-size:12px}
+.pool-table th{
+  padding:7px 10px;color:var(--ink-mut);font-weight:600;
+  border-bottom:1px solid var(--line);text-align:left;
+  font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap
+}
+.pool-table td{padding:8px 10px;border-bottom:1px solid rgba(201,168,76,.07);vertical-align:middle}
+.pool-row:last-child td{border-bottom:none}
+.pool-row.voided td{opacity:.45}
+.pool-row.voided .q-text{text-decoration:line-through}
+
+.q-text{font-weight:600;font-size:12.5px;max-width:200px;line-height:1.3}
+.pool-size{font-family:"DM Mono",monospace;font-weight:500;font-size:13px;color:var(--gold-soft)}
+.bettor-count{font-family:"DM Mono",monospace;color:var(--ink-mut);font-size:12px}
+
+/* split bar */
+.split-bar{display:flex;border-radius:4px;overflow:hidden;height:12px;width:90px;gap:1px}
+.split-yes{background:var(--yes);transition:width .4s}
+.split-no{background:var(--no);flex:1;transition:width .4s}
+.split-label{display:flex;gap:3px;font-family:"DM Mono",monospace;font-size:10px;margin-top:2px}
+.split-label .sy{color:var(--yes)} .split-label .sn{color:var(--no)}
+
+/* countdown */
+.countdown{font-family:"DM Mono",monospace;font-size:14px;font-weight:500;min-width:28px;text-align:right}
+.cd-hot{color:var(--no);animation:cdFlash .5s infinite alternate}
+@keyframes cdFlash{from{opacity:1}to{opacity:.4}}
+.cd-warm{color:var(--amber)}
+.cd-cool{color:var(--ink-mut)}
+.cd-locked{color:var(--gold);font-size:11px}
+
+/* rake */
+.rake-val{font-family:"DM Mono",monospace;font-size:12px;color:var(--gold)}
+
+/* row controls */
+.row-ctrl{display:flex;gap:4px;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:6px;
+  font-size:11px;font-weight:700;cursor:pointer;border:1px solid transparent;transition:all .12s}
+.btn-lock{background:rgba(201,168,76,.15);color:var(--gold);border-color:rgba(201,168,76,.3)}
+.btn-lock:hover{background:rgba(201,168,76,.28)}
+.btn-void{background:rgba(255,83,100,.12);color:var(--no);border-color:rgba(255,83,100,.25)}
+.btn-void:hover{background:rgba(255,83,100,.22)}
+.btn-settle{background:var(--yes-bg);color:var(--yes);border-color:rgba(29,203,134,.3)}
+.btn-settle:hover{background:rgba(29,203,134,.22)}
+.btn-disabled{opacity:.3;pointer-events:none}
+
+/* summary row */
+.pool-summary{
+  display:flex;gap:18px;align-items:center;padding:10px 14px;
+  border-top:1px solid var(--line);background:rgba(0,0,0,.15);font-size:12px;flex-wrap:wrap
+}
+.summary-stat{display:flex;flex-direction:column;gap:1px}
+.summary-label{color:var(--ink-mut);font-size:10px;text-transform:uppercase;letter-spacing:.4px}
+.summary-val{font-family:"DM Mono",monospace;font-weight:600;font-size:14px;color:var(--gold-soft)}
+.house-safe{color:var(--yes);font-size:11px;font-weight:700;margin-left:auto;
+  background:var(--yes-bg);padding:3px 10px;border-radius:6px;border:1px solid rgba(29,203,134,.2)}
+
+/* ============ COPILOT QUEUE ============ */
+.copilot-queue{display:flex;flex-direction:column;gap:0}
+.copilot-item{border-bottom:1px solid rgba(201,168,76,.07);padding:11px 14px;transition:background .15s}
+.copilot-item:hover{background:rgba(201,168,76,.04)}
+.copilot-item.dismissed{opacity:.3;pointer-events:none}
+.copilot-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px}
+.ai-tag{font-size:9.5px;font-weight:800;letter-spacing:.8px;color:var(--amber);
+  background:var(--amber-bg);border:1px solid rgba(232,163,60,.3);border-radius:4px;padding:1px 6px;
+  white-space:nowrap;margin-top:1px;flex-shrink:0}
+.copilot-q{font-weight:600;font-size:12.5px;line-height:1.35;flex:1}
+.conf-bar{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.conf-track{width:80px;height:4px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.conf-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s}
+.conf-val{font-family:"DM Mono",monospace;font-size:11px;color:var(--gold-soft)}
+.copilot-params{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.param-chip{font-size:10px;padding:2px 7px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);border-radius:4px;color:var(--ink-mut);
+  font-family:"DM Mono",monospace}
+.copilot-actions{display:flex;gap:6px}
+.btn-approve{background:var(--yes-bg);color:var(--yes);border:1px solid rgba(29,203,134,.3);
+  padding:4px 12px;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;transition:all .12s}
+.btn-approve:hover{background:rgba(29,203,134,.25)}
+.btn-edit{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(232,163,60,.25);
+  padding:4px 10px;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;transition:all .12s}
+.btn-edit:hover{background:rgba(232,163,60,.2)}
+.btn-reject{background:var(--red-bg);color:var(--no);border:1px solid rgba(255,83,100,.2);
+  padding:4px 10px;border-radius:6px;font-weight:700;font-size:11px;cursor:pointer;transition:all .12s}
+.btn-reject:hover{background:rgba(255,83,100,.18)}
+.copilot-disclaimer{font-size:10px;color:var(--ink-mut);padding:8px 14px;
+  border-top:1px solid var(--line);background:rgba(0,0,0,.12);display:flex;align-items:center;gap:6px}
+.copilot-disclaimer .ai-icon{opacity:.7}
+
+/* ============ CPMM EXPOSURE ============ */
+.cpmm-grid{display:flex;flex-direction:column;gap:0}
+.cpmm-row{border-bottom:1px solid rgba(201,168,76,.07);padding:11px 14px}
+.cpmm-row:last-child{border-bottom:none}
+.cpmm-top{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.cpmm-q{font-weight:600;font-size:12.5px;flex:1;line-height:1.3}
+.cents-pill{font-family:"DM Mono",monospace;font-size:13px;font-weight:700;
+  color:#fff;padding:2px 9px;border-radius:6px;background:var(--navy-2)}
+.cpmm-cents-chg{font-size:10px;font-family:"DM Mono",monospace}
+.chg-up{color:var(--yes)} .chg-dn{color:var(--no)}
+.cpmm-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px}
+.stat-cell{background:rgba(0,0,0,.2);border-radius:6px;padding:6px 8px}
+.stat-lbl{font-size:9.5px;color:var(--ink-mut);text-transform:uppercase;letter-spacing:.4px}
+.stat-val{font-family:"DM Mono",monospace;font-size:12.5px;font-weight:600;margin-top:1px}
+.stat-val.up{color:var(--yes)} .stat-val.dn{color:var(--no)} .stat-val.neutral{color:var(--gold-soft)}
+/* exposure gauge */
+.exp-gauge-wrap{margin-top:4px}
+.exp-gauge-label{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-mut);margin-bottom:3px}
+.exp-gauge-track{height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.exp-gauge-fill{height:100%;border-radius:3px;transition:width .4s}
+.gauge-low{background:var(--yes)} .gauge-mid{background:var(--amber)} .gauge-high{background:var(--no)}
+
+/* ============ INTEGRITY FEED ============ */
+.alert-feed{display:flex;flex-direction:column;gap:0;max-height:320px;overflow-y:auto}
+.alert-item{display:flex;gap:9px;padding:9px 14px;border-bottom:1px solid rgba(201,168,76,.05);
+  animation:fadeIn .35s ease;transition:background .2s}
+.alert-item:hover{background:rgba(255,255,255,.02)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.alert-item:last-child{border-bottom:none}
+.sev-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.sev-crit{background:var(--no);box-shadow:0 0 6px rgba(255,83,100,.5)}
+.sev-warn{background:var(--amber)}
+.sev-info{background:var(--ink-mut)}
+.alert-body{flex:1}
+.alert-msg{font-size:12px;line-height:1.4;font-weight:500}
+.alert-ts{font-family:"DM Mono",monospace;font-size:10px;color:var(--ink-mut);margin-top:2px}
+.suspension-counter{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  border-top:1px solid var(--line);background:rgba(0,0,0,.15);font-size:12px
+}
+.susp-num{font-family:"DM Mono",monospace;font-size:18px;font-weight:700;color:var(--no)}
+
+/* ============ COMPLIANCE PANEL ============ */
+.compliance-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px}
+.comp-cell{background:rgba(0,0,0,.2);border-radius:8px;padding:8px 10px}
+.comp-lbl{font-size:10px;color:var(--ink-mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.comp-val{font-family:"DM Mono",monospace;font-size:16px;font-weight:700}
+.comp-val.warn{color:var(--amber)} .comp-val.ok{color:var(--yes)} .comp-val.crit{color:var(--no)}
+.comp-sub{font-size:10px;color:var(--ink-mut);margin-top:2px}
+.region-banner{
+  margin:0 14px 12px;padding:7px 12px;border-radius:8px;
+  background:var(--yes-bg);border:1px solid rgba(29,203,134,.25);
+  display:flex;align-items:center;gap:8px;font-size:12px;
+}
+.region-dot{width:7px;height:7px;border-radius:50%;background:var(--yes)}
+
+/* ============ KPI TICKER ============ */
+.kpi-bar{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:0;
+  border-bottom:1px solid var(--line)
+}
+.kpi-cell{
+  padding:10px 14px;border-right:1px solid rgba(201,168,76,.07);
+}
+.kpi-cell:last-child{border-right:none}
+.kpi-label{font-size:10px;color:var(--ink-mut);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.kpi-value{font-family:"DM Mono",monospace;font-size:18px;font-weight:700;color:var(--gold-soft);
+  transition:color .3s}
+.kpi-value.flash{color:var(--gold)!important}
+.kpi-sub{font-size:10px;color:var(--ink-mut);margin-top:2px}
+
+/* ============ DEMO SWITCHER ============ */
+.demo-sw{
+  position:fixed;bottom:18px;right:18px;z-index:200;
+  background:var(--navy);border:1px solid var(--line);border-radius:12px;
+  padding:8px 14px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 4px 24px rgba(0,0,0,.5)
+}
+.demo-sw a{color:var(--ink-mut);font-size:12px;font-weight:600}
+.demo-sw a:hover{color:var(--gold)}
+.demo-sw .cur{font-size:11px;color:var(--gold);font-weight:700;border-left:1px solid var(--line);padding-left:10px}
+
+/* ============ SUSPENDED OVERLAY ============ */
+.suspend-overlay{
+  display:none;position:fixed;inset:0;z-index:50;
+  background:rgba(255,83,100,.08);
+  border:3px solid var(--no);pointer-events:none;
+}
+.suspend-overlay.active{display:block;animation:pulseOverlay 1.5s infinite}
+@keyframes pulseOverlay{0%,100%{border-color:rgba(255,83,100,.4)}50%{border-color:rgba(255,83,100,.9)}}
+.suspend-banner{
+  display:none;position:fixed;top:52px;left:0;right:0;z-index:90;
+  background:var(--no);color:#fff;text-align:center;padding:7px;
+  font-weight:800;font-size:14px;letter-spacing:.5px;
+}
+.suspend-banner.active{display:block}
+
+/* ============ DUAL CLOCK ============ */
+.dual-clock{display:flex;flex-direction:column;gap:1px;padding:4px 10px;border-left:1px solid var(--line)}
+.clock-row{display:flex;align-items:center;gap:5px;font-family:"DM Mono",monospace;font-size:11px}
+.clock-lbl{font-size:9px;color:var(--ink-mut);letter-spacing:.4px;width:50px;text-transform:uppercase}
+.clock-venue{color:var(--yes)}
+.clock-stream{color:var(--amber)}
+
+/* pool new flash */
+.pool-row.new-flash{animation:rowFlash .6s ease}
+@keyframes rowFlash{0%{background:rgba(201,168,76,.15)}100%{background:transparent}}
+
+@media(max-width:1200px){
+  .grid-main{grid-template-columns:1fr}
+  .kpi-bar{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:700px){
+  .kpi-bar{grid-template-columns:repeat(2,1fr)}
+  .pool-table th:nth-child(n+6), .pool-table td:nth-child(n+6){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- SUSPENDED OVERLAY -->
+<div class="suspend-overlay" id="suspendOverlay"></div>
+<div class="suspend-banner" id="suspendBanner">⛔ 全场封盘 · ALL MARKETS SUSPENDED · 全场封盘</div>
+
+<!-- ====== TOP STATUS BAR ====== -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="wordmark">
+      <span>Sorak</span>
+      <div class="sub">Live Ops</div>
+    </div>
+    <div class="divider-v"></div>
+    <div class="match-pill">
+      <div class="live-dot"></div>
+      <span class="match-name">🇧🇷 BRA <span style="color:var(--ink-mut);font-size:13px">1–0</span> ARG 🇦🇷</span>
+      <span class="match-clock" id="matchClock">32'</span>
+      <span class="match-meta">小组赛 C 组 · MetLife Stadium</span>
+    </div>
+    <div class="feed-block">
+      <div class="feed-label">IMDO Feed</div>
+      <div class="feed-status"><span class="feed-ok">● OK</span><span class="feed-ts" id="feedTs">14:32:18.4</span></div>
+    </div>
+    <div class="dual-clock">
+      <div class="clock-row"><span class="clock-lbl">VENUE</span><span class="mono clock-venue" id="venueTime">14:32:19</span></div>
+      <div class="clock-row"><span class="clock-lbl">STREAM</span><span class="mono clock-stream" id="streamTime">14:32:11</span></div>
+    </div>
+    <div class="delay-block">
+      <div class="feed-label">Stream Delay</div>
+      <div class="delay-val mono" id="delayVal">~8.3s</div>
+    </div>
+    <div class="topbar-right">
+      <div class="op-chip">
+        <div class="op-dot"></div>
+        <span>值班: 李 Operator #4</span>
+        <span style="color:var(--ink-mut);margin-left:4px;font-size:10px">双控已确认</span>
+      </div>
+      <button class="suspend-btn" id="suspendBtn" onclick="toggleSuspend()">
+        <span>⛔</span> 全场封盘
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ====== KPI BAR ====== -->
+  <div class="card" style="margin-bottom:14px">
+    <div class="kpi-bar">
+      <div class="kpi-cell">
+        <div class="kpi-label">本场投注额 Handle</div>
+        <div class="kpi-value" id="kpiHandle">MYR 284,610</div>
+        <div class="kpi-sub">↑ 12% vs last match</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">抽水收入 Rake</div>
+        <div class="kpi-value" id="kpiRake">MYR 8,344</div>
+        <div class="kpi-sub">avg 3.8% effective</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">活跃用户 Active</div>
+        <div class="kpi-value" id="kpiUsers">1,847</div>
+        <div class="kpi-sub">peak 2,102</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">已运行盘数 Pools</div>
+        <div class="kpi-value" id="kpiPools">23</div>
+        <div class="kpi-sub">avg 40s per pool</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">平均池 Avg Pool</div>
+        <div class="kpi-value" id="kpiAvgPool">MYR 12,375</div>
+        <div class="kpi-sub">min pool 20× cap</div>
+      </div>
+      <div class="kpi-cell">
+        <div class="kpi-label">结算延迟 Settle Lat</div>
+        <div class="kpi-value" id="kpiLat">1.4s</div>
+        <div class="kpi-sub">IMDO → official</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-main">
+    <div class="grid-left">
+
+      <!-- ====== LIVE POOL MONITOR ====== -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">⚡ 闪电盘 · 主面板 — Live Pool Monitor</div>
+          <div class="card-meta">
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--yes)" id="openCount">4 盘投注中</span>
+            <span style="color:var(--line)">|</span>
+            <span>抽水累计: <span class="mono" style="color:var(--gold)" id="rakeTotal">MYR 8,344</span></span>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="pool-table">
+            <thead>
+              <tr>
+                <th>盘口 Market</th>
+                <th>状态 State</th>
+                <th>剩余 TTL</th>
+                <th>池量 Pool</th>
+                <th>YES/NO</th>
+                <th>下注人</th>
+                <th>用户上限</th>
+                <th>抽水 Rake</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="poolTbody"></tbody>
+          </table>
+        </div>
+        <div class="pool-summary">
+          <div class="summary-stat">
+            <div class="summary-label">本场总投注</div>
+            <div class="summary-val" id="sumHandle">MYR 284,610</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-label">总抽水</div>
+            <div class="summary-val" id="sumRake">MYR 8,344</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-label">已结算池</div>
+            <div class="summary-val" id="sumSettled">19 / 23</div>
+          </div>
+          <div class="summary-stat">
+            <div class="summary-label">作废盘</div>
+            <div class="summary-val" id="sumVoided" style="color:var(--ink-mut)">1</div>
+          </div>
+          <div class="house-safe">彩池制 · 庄家无方向性风险 ✓</div>
+        </div>
+      </div>
+
+      <!-- ====== CPMM EXPOSURE ====== -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📊 全场盘 · 庄家持仓风险 — CPMM Exposure</div>
+          <div class="card-meta">
+            <span style="color:var(--no);font-size:11px;font-weight:700">庄家有方向性风险 — 需监控</span>
+          </div>
+        </div>
+        <div class="cpmm-grid" id="cpmmGrid"></div>
+      </div>
+
+      <!-- ====== INTEGRITY FEED ====== -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🛡 诚信与异常 · Integrity &amp; Anomaly Feed</div>
+          <div class="card-meta">
+            <span style="font-family:'DM Mono',monospace;font-size:11px">自动封号: <span style="color:var(--no)" id="suspCount">3</span></span>
+          </div>
+        </div>
+        <div class="alert-feed" id="alertFeed"></div>
+        <div class="suspension-counter">
+          <div>
+            <div style="font-size:10px;color:var(--ink-mut);text-transform:uppercase;letter-spacing:.4px">本场自动封号</div>
+            <div class="susp-num" id="suspNum">3</div>
+          </div>
+          <div style="flex:1;font-size:11px;color:var(--ink-mut)">
+            疑似 courtsiding / 骡子账户 / 串谋 — 待人工复核
+          </div>
+          <button class="btn btn-void" onclick="addAlert('warn','⚠ 手动触发:全局风控审查','系统')">触发风控审查</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="grid-right">
+
+      <!-- ====== COPILOT QUEUE ====== -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🤖 盘口生成 Copilot · 人审双控队列</div>
+          <div class="card-meta">
+            <span id="coqCount" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--amber)">2 待审</span>
+          </div>
+        </div>
+        <div class="copilot-queue" id="copilotQueue"></div>
+        <div class="copilot-disclaimer">
+          <span class="ai-icon">⚠</span>
+          AI 仅建议，<strong style="color:var(--amber)">人工双控审批</strong>后方可开盘。AI 不设赔率、不自动开真钱盘。
+        </div>
+      </div>
+
+      <!-- ====== COMPLIANCE & RG ====== -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">✅ 合规 &amp; 负责任游戏 — Compliance / RG</div>
+        </div>
+        <div class="region-banner">
+          <div class="region-dot"></div>
+          <div>
+            <strong>真钱区:</strong> MY · SG · PH (持牌 in-play 合法)
+            <span style="color:var(--yes);font-weight:700;margin-left:6px">LICENSED ✓</span>
+          </div>
+          <div style="margin-left:auto;font-size:10px;color:var(--ink-mut)">其他地区 → 免费积分场</div>
+        </div>
+        <div class="compliance-grid" id="compGrid">
+          <div class="comp-cell">
+            <div class="comp-lbl">KYC 待处理</div>
+            <div class="comp-val warn" id="compKyc">14</div>
+            <div class="comp-sub">须 24h 内完成</div>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-lbl">AML 标记</div>
+            <div class="comp-val warn" id="compAml">3</div>
+            <div class="comp-sub">本场触发</div>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-lbl">地理封锁</div>
+            <div class="comp-val ok" id="compGeo">47</div>
+            <div class="comp-sub">→ 免费积分场</div>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-lbl">RG 冷却</div>
+            <div class="comp-val ok" id="compRg">8</div>
+            <div class="comp-sub">6盘后自动触发</div>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-lbl">自我排除</div>
+            <div class="comp-val ok" id="compEx">2</div>
+            <div class="comp-sub">已生效 ✓</div>
+          </div>
+          <div class="comp-cell">
+            <div class="comp-lbl">存款 AML</div>
+            <div class="comp-val ok" id="compDep">OK</div>
+            <div class="comp-sub">每笔实时核验</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- DEMO SWITCHER -->
+<div class="demo-sw">
+  <a href="./index.html">← 挑选 Players</a>
+  <span class="cur">Admin / Live Ops</span>
+</div>
+
+<script src="./wc-data.js"></script>
+<script>
+// ================================================================
+// SORAK · ADMIN / LIVE-OPS CONSOLE — Mock Data + Simulated Live
+// ================================================================
+
+// --------- STATE ---------
+let suspended = false;
+let suspensionCount = 3;
+let rakeAccrued = 8344;
+let handleTotal = 284610;
+let activeUsers = 1847;
+let poolsRun = 23;
+let settledCount = 19;
+let voidedCount = 1;
+
+// Pool FSM states
+const STATE = { OPEN:'open', LOCK:'lock', PROV:'prov', OFFICIAL:'official', VOID:'void' };
+
+// --------- POOL DATA ---------
+let pools = [
+  {
+    id:'p001', q:'未来 5 分钟内会有进球吗?', q_en:'Goal in next 5min?',
+    state: STATE.OPEN, ttl:18, pool:14200, yesP:58, bettors:143, cap:420, rake:5,
+    rakePct:0.05
+  },
+  {
+    id:'p002', q:'下一个进球是巴西吗?', q_en:'Brazil scores next?',
+    state: STATE.OPEN, ttl:31, pool:21500, yesP:64, bettors:218, cap:640, rake:5,
+    rakePct:0.05
+  },
+  {
+    id:'p003', q:'未来 10 分钟内会出黄/红牌吗?', q_en:'Card next 10min?',
+    state: STATE.LOCK, ttl:0, pool:9800, yesP:43, bettors:97, cap:290, rake:3,
+    rakePct:0.03
+  },
+  {
+    id:'p004', q:'未来 5 分钟内会有角球吗?', q_en:'Corner next 5min?',
+    state: STATE.OPEN, ttl:9, pool:18700, yesP:71, bettors:186, cap:560, rake:5,
+    rakePct:0.05
+  },
+  {
+    id:'p005', q:'Vinícius 本节会进球或助攻吗?', q_en:'Vinícius G/A this spell?',
+    state: STATE.PROV, ttl:0, pool:6300, yesP:38, bettors:62, cap:189, rake:3,
+    rakePct:0.03, result:'YES'
+  },
+  {
+    id:'p006', q:'门将本节会有扑救吗?', q_en:'Keeper save this spell?',
+    state: STATE.OFFICIAL, ttl:0, pool:8100, yesP:55, bettors:81, cap:243, rake:5,
+    rakePct:0.05, result:'YES'
+  },
+];
+
+function calcRake(pool, rakePct){ return Math.round(pool * rakePct); }
+
+// --------- RENDER POOLS ---------
+function renderPools(){
+  const tbody = document.getElementById('poolTbody');
+  let openCount = 0;
+  tbody.innerHTML = pools.map(p => {
+    if(p.state === STATE.OPEN) openCount++;
+    const rakeAmt = calcRake(p.pool, p.rakePct);
+    const isVoided = p.state === STATE.VOID;
+
+    let stateBadge = '';
+    if(p.state === STATE.OPEN) stateBadge = '<span class="badge badge-open">● 投注中</span>';
+    else if(p.state === STATE.LOCK) stateBadge = '<span class="badge badge-lock">🔒 已锁</span>';
+    else if(p.state === STATE.PROV) stateBadge = '<span class="badge badge-prov">⏳ 临时</span>';
+    else if(p.state === STATE.OFFICIAL) stateBadge = '<span class="badge badge-official">✓ 官方</span>';
+    else if(p.state === STATE.VOID) stateBadge = '<span class="badge badge-void">作废</span>';
+
+    let ttlCell = '';
+    if(p.state === STATE.OPEN){
+      let cdClass = p.ttl <= 3 ? 'cd-hot' : p.ttl <= 10 ? 'cd-warm' : 'cd-cool';
+      ttlCell = `<span class="countdown ${cdClass}">${p.ttl}s</span>`;
+    } else if(p.state === STATE.LOCK){
+      ttlCell = `<span class="countdown cd-locked">封盘</span>`;
+    } else {
+      ttlCell = `<span class="countdown cd-cool">—</span>`;
+    }
+
+    const lockDisabled = (p.state !== STATE.OPEN) ? 'btn-disabled' : '';
+    const voidDisabled = (p.state === STATE.OFFICIAL || p.state === STATE.VOID) ? 'btn-disabled' : '';
+    const settleDisabled = (p.state !== STATE.PROV) ? 'btn-disabled' : '';
+
+    return `<tr class="pool-row${isVoided?' voided':''}${p._new?' new-flash':''}" id="row-${p.id}">
+      <td><div class="q-text">${p.q}</div><div style="color:var(--ink-mut);font-size:10px">${p.q_en}</div></td>
+      <td>${stateBadge}</td>
+      <td>${ttlCell}</td>
+      <td><span class="pool-size">MYR ${(p.pool).toLocaleString()}</span></td>
+      <td>
+        <div class="split-bar">
+          <div class="split-yes" style="width:${p.yesP}%"></div>
+          <div class="split-no"></div>
+        </div>
+        <div class="split-label"><span class="sy">${p.yesP}%Y</span> <span class="sn">${100-p.yesP}%N</span></div>
+      </td>
+      <td><span class="bettor-count">${p.bettors}</span></td>
+      <td><span class="mono" style="font-size:11px;color:var(--ink-mut)">MYR ${p.cap}</span></td>
+      <td><span class="rake-val">MYR ${rakeAmt}</span></td>
+      <td>
+        <div class="row-ctrl">
+          <button class="btn btn-lock ${lockDisabled}" onclick="lockPool('${p.id}')">封盘</button>
+          <button class="btn btn-void ${voidDisabled}" onclick="voidPool('${p.id}')">作废</button>
+          <button class="btn btn-settle ${settleDisabled}" onclick="settlePool('${p.id}')">结算</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('openCount').textContent = openCount + ' 盘投注中';
+  updateSummary();
+}
+
+function updateSummary(){
+  document.getElementById('rakeTotal').textContent = 'MYR ' + rakeAccrued.toLocaleString();
+  document.getElementById('sumHandle').textContent = 'MYR ' + handleTotal.toLocaleString();
+  document.getElementById('sumRake').textContent = 'MYR ' + rakeAccrued.toLocaleString();
+  document.getElementById('sumSettled').textContent = settledCount + ' / ' + poolsRun;
+  document.getElementById('sumVoided').textContent = voidedCount;
+  document.getElementById('kpiHandle').textContent = 'MYR ' + handleTotal.toLocaleString();
+  document.getElementById('kpiRake').textContent = 'MYR ' + rakeAccrued.toLocaleString();
+  document.getElementById('kpiPools').textContent = poolsRun;
+  document.getElementById('kpiUsers').textContent = activeUsers.toLocaleString();
+  document.getElementById('kpiAvgPool').textContent = 'MYR ' + Math.round(handleTotal/poolsRun).toLocaleString();
+}
+
+// --------- POOL CONTROLS ---------
+function lockPool(id){
+  const p = pools.find(x=>x.id===id);
+  if(!p || p.state !== STATE.OPEN) return;
+  p.state = STATE.LOCK; p.ttl = 0;
+  renderPools();
+  addAlert('info', `🔒 盘口已手动封盘: "${p.q.substring(0,22)}…"`, 'OPERATOR');
+  setTimeout(()=>{ p.state = STATE.PROV; renderPools(); }, 4000);
+}
+
+function voidPool(id){
+  const p = pools.find(x=>x.id===id);
+  if(!p || p.state === STATE.OFFICIAL || p.state === STATE.VOID) return;
+  p.state = STATE.VOID;
+  voidedCount++;
+  rakeAccrued -= calcRake(p.pool, p.rakePct); // refund rake
+  handleTotal -= p.pool; // not counted
+  renderPools();
+  addAlert('warn', `⛔ 盘口作废 (全额退款含抽水): "${p.q.substring(0,20)}…"`, 'OPERATOR');
+}
+
+function settlePool(id){
+  const p = pools.find(x=>x.id===id);
+  if(!p || p.state !== STATE.PROV) return;
+  p.state = STATE.OFFICIAL;
+  settledCount++;
+  rakeAccrued += calcRake(p.pool, p.rakePct);
+  renderPools();
+  addAlert('info', `✓ 结算完成 (IMDO 官方数据): "${p.q.substring(0,22)}…"`, 'IMDO');
+  document.getElementById('kpiLat').textContent = (0.8 + Math.random()*1.2).toFixed(1) + 's';
+}
+
+// --------- SIMULATE LIVE ---------
+let tickCount = 0;
+setInterval(()=>{
+  if(suspended) return;
+  tickCount++;
+
+  // count down open pools, grow pools
+  pools.forEach(p=>{
+    if(p.state === STATE.OPEN){
+      p.ttl = Math.max(0, p.ttl - 1);
+      if(Math.random() < 0.6){
+        const add = Math.floor(Math.random()*400+50);
+        p.pool += add; handleTotal += add;
+        p.bettors += Math.random()<0.3 ? 1 : 0;
+        rakeAccrued += Math.round(add * p.rakePct);
+      }
+      // drift yes%
+      p.yesP = Math.min(90, Math.max(10, p.yesP + (Math.random()-.5)*2));
+      p.yesP = Math.round(p.yesP);
+
+      if(p.ttl === 0){
+        p.state = STATE.LOCK;
+        setTimeout(()=>{
+          p.state = STATE.PROV;
+          renderPools();
+          addAlert('info', `⏳ 临时结算: "${p.q.substring(0,20)}…" — 等待 IMDO 确认`, 'SYSTEM');
+        }, 5000 + Math.random()*4000);
+      }
+    }
+  });
+
+  // occasionally spawn new pool
+  if(tickCount % 22 === 0 && !suspended){
+    spawnNewPool();
+  }
+
+  // update active users
+  activeUsers += Math.floor((Math.random()-.4)*12);
+  activeUsers = Math.max(1200, activeUsers);
+
+  renderPools();
+  updateSummary();
+  flashKpi('kpiHandle');
+  flashKpi('kpiUsers');
+
+  // update clock
+  updateClocks();
+
+}, 1000);
+
+function flashKpi(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('flash');
+  setTimeout(()=>el.classList.remove('flash'), 300);
+}
+
+function spawnNewPool(){
+  const templates = [
+    {q:'未来 5 分钟内会有射正吗?', qe:'Shot on target next 5min?', rake:0.05},
+    {q:'未来 10 分钟内会有 VAR 介入吗?', qe:'VAR review next 10min?', rake:0.05},
+    {q:'本节节奏:进球过 1.5?', qe:'Over 1.5 goals this spell?', rake:0.03},
+    {q:'未来 5 分钟内会有角球吗?', qe:'Corner next 5min?', rake:0.05},
+    {q:'Vinícius 下次拿球会被犯规吗?', qe:'Vinícius fouled next touch?', rake:0.03},
+  ];
+  const t = templates[Math.floor(Math.random()*templates.length)];
+  const pool = 3000 + Math.floor(Math.random()*5000);
+  const cap = Math.round(pool * 0.08);
+  const newPool = {
+    id: 'p' + Date.now(),
+    q: t.q, q_en: t.qe,
+    state: STATE.OPEN,
+    ttl: 15 + Math.floor(Math.random()*25),
+    pool, yesP: 40 + Math.floor(Math.random()*30),
+    bettors: Math.floor(pool/120), cap,
+    rake: t.rake*100, rakePct: t.rake,
+    _new: true
+  };
+  pools.push(newPool);
+  poolsRun++;
+  handleTotal += pool;
+  rakeAccrued += calcRake(pool, t.rake);
+  renderPools();
+  addAlert('info', `⚡ 新盘已开: "${t.q.substring(0,22)}…" — 人工审批已通过`, 'LIVE-OPS');
+  setTimeout(()=>{ newPool._new = false; }, 700);
+}
+
+// --------- COPILOT QUEUE ---------
+const copilotSuggestions = [
+  {
+    id:'cq1',
+    icon:'⚽',
+    q:'进攻势头上升 — 开"未来 5 分钟进球"盘?',
+    qe:"Momentum rising — open 'goal next 5min'?",
+    conf:82,
+    params:['窗口:20s','封盘提前:60s','抽水:5%','用户上限:MYR 500'],
+    dismissed: false
+  },
+  {
+    id:'cq2',
+    icon:'🟨',
+    q:'裁判尺度严 — 开"下张牌 10min 内"盘?',
+    qe:"Ref going strict — open 'card next 10min'?",
+    conf:67,
+    params:['窗口:20s','封盘提前:60s','抽水:5%','用户上限:MYR 300'],
+    dismissed: false
+  },
+  {
+    id:'cq3',
+    icon:'🔁',
+    q:'阿根廷高压逼抢 — 开"角球 5min 内"盘?',
+    qe:"ARG pressing hard — open 'corner next 5min'?",
+    conf:74,
+    params:['窗口:20s','封盘提前:45s','抽水:5%','用户上限:MYR 450'],
+    dismissed: false
+  },
+];
+
+function renderCopilot(){
+  const queue = document.getElementById('copilotQueue');
+  const active = copilotSuggestions.filter(s=>!s.dismissed);
+  document.getElementById('coqCount').textContent = active.length + ' 待审';
+  queue.innerHTML = copilotSuggestions.map(s=>`
+    <div class="copilot-item${s.dismissed?' dismissed':''}" id="cq-${s.id}">
+      <div class="copilot-top">
+        <span class="ai-tag">AI SUGGEST</span>
+        <div class="copilot-q">${s.icon} ${s.q}<div style="color:var(--ink-mut);font-size:10.5px;font-weight:400;margin-top:2px">${s.qe}</div></div>
+      </div>
+      <div class="conf-bar">
+        <span style="font-size:10px;color:var(--ink-mut)">置信度</span>
+        <div class="conf-track"><div class="conf-fill" style="width:${s.conf}%"></div></div>
+        <span class="conf-val">${s.conf}%</span>
+      </div>
+      <div class="copilot-params">${s.params.map(p=>`<span class="param-chip">${p}</span>`).join('')}</div>
+      <div class="copilot-actions">
+        <button class="btn-approve" onclick="approveSuggestion('${s.id}')">✓ 批准开盘</button>
+        <button class="btn-edit" onclick="editSuggestion('${s.id}')">✏ 编辑参数</button>
+        <button class="btn-reject" onclick="rejectSuggestion('${s.id}')">✕ 拒绝</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function approveSuggestion(id){
+  const s = copilotSuggestions.find(x=>x.id===id);
+  if(!s || s.dismissed) return;
+  s.dismissed = true;
+  renderCopilot();
+  // spawn into live monitor
+  const pool = 4000 + Math.floor(Math.random()*6000);
+  const cap = Math.round(pool * 0.09);
+  const newPool = {
+    id: 'p' + Date.now(),
+    q: s.q.replace(/^[⚽🟨🔁]\s+/,'').replace(/— 开.*/,'').trim(),
+    q_en: s.qe.replace(/^[⚽🟨🔁]\s+/,'').replace(/— open.*/,'').trim(),
+    state: STATE.OPEN,
+    ttl: 18 + Math.floor(Math.random()*12),
+    pool, yesP: 45 + Math.floor(Math.random()*20),
+    bettors: Math.floor(pool/110), cap,
+    rake: 5, rakePct: 0.05,
+    _new: true
+  };
+  pools.push(newPool);
+  poolsRun++;
+  handleTotal += pool;
+  rakeAccrued += calcRake(pool, 0.05);
+  renderPools();
+  addAlert('info', `✅ Copilot 建议已批准开盘: "${newPool.q.substring(0,22)}…" (双控确认)`, 'OPERATOR');
+  setTimeout(()=>{ newPool._new = false; }, 700);
+}
+
+function editSuggestion(id){
+  addAlert('info', `✏ Copilot 建议进入编辑模式 — 待操作员修改参数后开盘`, 'OPERATOR');
+}
+
+function rejectSuggestion(id){
+  const s = copilotSuggestions.find(x=>x.id===id);
+  if(!s || s.dismissed) return;
+  s.dismissed = true;
+  renderCopilot();
+  addAlert('warn', `✕ Copilot 建议已拒绝: "${s.q.substring(0,22)}…"`, 'OPERATOR');
+}
+
+// --------- CPMM EXPOSURE ---------
+const cpmmMarkets = [
+  {
+    q:'巴西会赢下本场吗?', qe:'Brazil win?',
+    yes:44, chg:0, vol:2860000,
+    housePos:-18400, maxLossYes:42000, maxLossNo:31000,
+    limitPct:52, takeRate:3.2
+  },
+  {
+    q:'本场总进球 2.5 球以上?', qe:'Over 2.5 goals?',
+    yes:57, chg:+2, vol:1640000,
+    housePos:+8200, maxLossYes:28000, maxLossNo:22000,
+    limitPct:34, takeRate:2.8
+  },
+  {
+    q:'双方都进球?', qe:'Both teams to score?',
+    yes:63, chg:+1, vol:1220000,
+    housePos:+5100, maxLossYes:19000, maxLossNo:17000,
+    limitPct:28, takeRate:3.5
+  }
+];
+
+function renderCpmm(){
+  const grid = document.getElementById('cpmmGrid');
+  grid.innerHTML = cpmmMarkets.map(m => {
+    const chgTxt = m.chg > 0 ? `<span class="cpmm-cents-chg chg-up">+${m.chg}¢ ↑</span>` :
+                   m.chg < 0 ? `<span class="cpmm-cents-chg chg-dn">${m.chg}¢ ↓</span>` :
+                   `<span class="cpmm-cents-chg" style="color:var(--ink-mut)">—</span>`;
+    const posCol = m.housePos > 0 ? 'up' : 'dn';
+    const posSign = m.housePos > 0 ? '+' : '';
+    const gaugeClass = m.limitPct < 40 ? 'gauge-low' : m.limitPct < 70 ? 'gauge-mid' : 'gauge-high';
+    return `<div class="cpmm-row">
+      <div class="cpmm-top">
+        <div class="cpmm-q">${m.q}<div style="color:var(--ink-mut);font-size:10.5px;font-weight:400">${m.qe}</div></div>
+        <div style="text-align:right">
+          <div class="cents-pill">${m.yes}¢</div>
+          <div style="margin-top:3px">${chgTxt}</div>
+        </div>
+      </div>
+      <div class="cpmm-stats">
+        <div class="stat-cell">
+          <div class="stat-lbl">Vol</div>
+          <div class="stat-val neutral">MYR ${(m.vol/1000).toFixed(0)}k</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-lbl">庄家持仓</div>
+          <div class="stat-val ${posCol}">${posSign}MYR ${Math.abs(m.housePos).toLocaleString()}</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-lbl">Take Rate</div>
+          <div class="stat-val neutral">${m.takeRate}%</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:6px;font-size:11px">
+        <span style="flex:1;background:var(--yes-bg);border-radius:5px;padding:4px 7px">
+          <span style="color:var(--ink-mut)">YES最大亏损:</span>
+          <span class="mono" style="color:var(--no)"> −MYR ${m.maxLossYes.toLocaleString()}</span>
+        </span>
+        <span style="flex:1;background:var(--red-bg);border-radius:5px;padding:4px 7px">
+          <span style="color:var(--ink-mut)">NO最大亏损:</span>
+          <span class="mono" style="color:var(--no)"> −MYR ${m.maxLossNo.toLocaleString()}</span>
+        </span>
+      </div>
+      <div class="exp-gauge-wrap">
+        <div class="exp-gauge-label"><span>风险敞口</span><span>${m.limitPct}% / 上限</span></div>
+        <div class="exp-gauge-track"><div class="exp-gauge-fill ${gaugeClass}" style="width:${m.limitPct}%"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// --------- INTEGRITY FEED ---------
+const initAlerts = [
+  {sev:'crit', msg:'⚠ 用户 #8842 下注早于进球 1.2s — courtsiding 评分 0.81 — 已自动封号', src:'AI-FRAUD', ts:null},
+  {sev:'crit', msg:'🔍 3 个账户同设备 IP 192.168.x.42 — 骡子账户审查中', src:'AI-FRAUD', ts:null},
+  {sev:'warn', msg:'📡 数据流时间戳缺口 2.3s (14:28:41) — 市场已自动暂停 4s', src:'FEED-MON', ts:null},
+  {sev:'crit', msg:'⚠ 用户 #3319 在 3 分钟内开 4 个账户下注 — 串谋评分 0.74 — 已挂起', src:'AI-FRAUD', ts:null},
+  {sev:'info', msg:'✓ IMDO 确认: 第31分钟进球 BRA #9 Vinícius — 官方结算已触发', src:'IMDO', ts:null},
+  {sev:'warn', msg:'⚠ 用户 #7721 本场投注额 MYR 14,200 — 触发 AML 大额预警', src:'AML-ENGINE', ts:null},
+  {sev:'info', msg:'✓ 地理围栏: VN/TH 用户 47 人已路由到免费积分场', src:'GEO-FENCE', ts:null},
+];
+
+let alertData = initAlerts.map((a,i)=>({...a, ts: relTs(-(6-i)*90)}));
+
+function relTs(secOffset){
+  const now = new Date();
+  now.setSeconds(now.getSeconds() + secOffset);
+  return now.toTimeString().slice(0,8);
+}
+
+function addAlert(sev, msg, src){
+  alertData.unshift({sev, msg, src, ts: new Date().toTimeString().slice(0,8)});
+  alertData = alertData.slice(0, 30);
+  renderAlerts();
+  if(sev === 'crit'){
+    suspensionCount++;
+    document.getElementById('suspCount').textContent = suspensionCount;
+    document.getElementById('suspNum').textContent = suspensionCount;
+  }
+}
+
+function renderAlerts(){
+  const feed = document.getElementById('alertFeed');
+  feed.innerHTML = alertData.map(a=>`
+    <div class="alert-item">
+      <div class="sev-dot sev-${a.sev}"></div>
+      <div class="alert-body">
+        <div class="alert-msg">${a.msg}</div>
+        <div class="alert-ts">${a.ts} · ${a.src}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Random integrity alerts
+const randomAlerts = [
+  ['warn','⚠ 用户 #5503 RG 冷却触发 (连续 6 盘)','RG-ENGINE'],
+  ['info','✓ 进球时间戳比对完成 — 无异常','IMDO'],
+  ['warn','📡 Cloudflare 延迟波动 +1.8s — 已标记','NET-MON'],
+  ['crit','⚠ 用户 #2241 疑似 VPN 接入真钱市场 — 已封锁','GEO-FENCE'],
+  ['info','✓ AML 人工复核完成: #7721 解除挂起','AML-OPS'],
+  ['warn','⚠ 用户 #9910 存款 MYR 8,000 触发 AML 门槛','AML-ENGINE'],
+  ['info','✓ 规则哈希冻结已验证 — pool #p003','INTEGRITY'],
+  ['crit','⚠ 骡子账户 #3319/#3320/#3321 关联确认 — 移交合规','AI-FRAUD'],
+];
+
+let alertTick = 0;
+setInterval(()=>{
+  alertTick++;
+  if(alertTick % 14 === 0 && !suspended){
+    const a = randomAlerts[Math.floor(Math.random()*randomAlerts.length)];
+    addAlert(a[0], a[1], a[2]);
+  }
+}, 1000);
+
+// --------- CLOCK + FEED ---------
+function updateClocks(){
+  const now = new Date();
+  const venue = new Date(now.getTime() + 8300);
+  const stream = new Date(now.getTime());
+  document.getElementById('venueTime').textContent = venue.toTimeString().slice(0,8);
+  document.getElementById('streamTime').textContent = stream.toTimeString().slice(0,8);
+  document.getElementById('feedTs').textContent = venue.toTimeString().slice(0,11).replace(' ','');
+  const delay = (7.8 + Math.random()*1).toFixed(1);
+  document.getElementById('delayVal').textContent = '~' + delay + 's';
+}
+
+// match clock
+let matchMinute = 32;
+let matchSecond = 14;
+setInterval(()=>{
+  matchSecond++;
+  if(matchSecond >= 60){ matchSecond = 0; matchMinute++; }
+  document.getElementById('matchClock').textContent = matchMinute + "'";
+}, 1000);
+
+// --------- SUSPEND ---------
+function toggleSuspend(){
+  suspended = !suspended;
+  const btn = document.getElementById('suspendBtn');
+  const overlay = document.getElementById('suspendOverlay');
+  const banner = document.getElementById('suspendBanner');
+  if(suspended){
+    btn.textContent = '▶ 恢复盘口';
+    btn.classList.add('active');
+    overlay.classList.add('active');
+    banner.classList.add('active');
+    // lock all open pools
+    pools.forEach(p=>{ if(p.state===STATE.OPEN){ p.state=STATE.LOCK; p.ttl=0; }});
+    renderPools();
+    addAlert('crit', '⛔ 全场封盘 · ALL MARKETS SUSPENDED — 操作员手动触发', 'OPERATOR');
+  } else {
+    btn.innerHTML = '<span>⛔</span> 全场封盘';
+    btn.classList.remove('active');
+    overlay.classList.remove('active');
+    banner.classList.remove('active');
+    addAlert('info', '▶ 全场解封 — 恢复正常运营', 'OPERATOR');
+  }
+}
+
+// --------- COMPLIANCE SIMULATION ---------
+setInterval(()=>{
+  const kyc = parseInt(document.getElementById('compKyc').textContent);
+  const geo = parseInt(document.getElementById('compGeo').textContent);
+  if(Math.random()<0.2){
+    document.getElementById('compKyc').textContent = kyc + Math.floor(Math.random()*3-1);
+    document.getElementById('compGeo').textContent = geo + Math.floor(Math.random()*3);
+    document.getElementById('compRg').textContent = parseInt(document.getElementById('compRg').textContent) + (Math.random()<0.3?1:0);
+  }
+}, 5000);
+
+// --------- CPMM LIVE DRIFT ---------
+setInterval(()=>{
+  cpmmMarkets.forEach(m=>{
+    m.yes = Math.min(85, Math.max(15, m.yes + (Math.random()-.5)*1.2));
+    m.yes = Math.round(m.yes);
+    m.chg = Math.round((Math.random()-.5)*3);
+    m.housePos += Math.floor((Math.random()-.45)*1200);
+    m.vol += Math.floor(Math.random()*3000);
+    m.limitPct = Math.min(95, Math.max(10, m.limitPct + (Math.random()-.4)*2));
+    m.limitPct = Math.round(m.limitPct);
+  });
+  renderCpmm();
+}, 3000);
+
+// --------- INIT ---------
+renderPools();
+renderCopilot();
+renderCpmm();
+renderAlerts();
+updateClocks();
+</script>
+</body>
+</html>

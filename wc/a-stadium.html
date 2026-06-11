@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sorak · 世界杯带盘直播 — Stadium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#16285C; --navy-deep:#0D1838; --navy-2:#1B2E66; --gold:#C9A84C; --gold-deep:#A8842B;
+  --gold-soft:#E7D499; --cream:#F4F1E8; --yes:#1DCB86; --no:#FF5364; --pitch:#0d5a2f;
+  --ink:#EAE6F2; --ink-mut:#9aa0c4; --line:rgba(201,168,76,.18); --card:#141d3f; --card-2:#10173155;
+  --amber:#E8A33C;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:
+  radial-gradient(1200px 600px at 80% -5%,rgba(201,168,76,.10),transparent 60%),
+  radial-gradient(900px 500px at 0% 100%,rgba(29,203,134,.07),transparent 60%),
+  var(--navy-deep);
+  color:var(--ink);font-family:"Schibsted Grotesk","Noto Sans SC",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;}
+body{min-height:100vh}
+.wrap{max-width:1320px;margin:0 auto;padding:0 18px 80px}
+.mono{font-family:"DM Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.serif{font-family:"DM Serif Display",serif}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+
+/* ---- top bar ---- */
+.topbar{position:sticky;top:0;z-index:30;backdrop-filter:blur(14px);
+  background:linear-gradient(180deg,rgba(13,24,56,.92),rgba(13,24,56,.72));
+  border-bottom:1px solid var(--line)}
+.topin{max-width:1320px;margin:0 auto;padding:11px 18px;display:flex;align-items:center;gap:18px}
+.brand{font-family:"DM Serif Display",serif;font-size:23px;letter-spacing:.5px;display:flex;align-items:center;gap:9px}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--no);box-shadow:0 0 0 0 rgba(255,83,100,.6);animation:pp 1.6s infinite}
+@keyframes pp{0%{box-shadow:0 0 0 0 rgba(255,83,100,.55)}70%{box-shadow:0 0 0 9px rgba(255,83,100,0)}100%{box-shadow:0 0 0 0 rgba(255,83,100,0)}}
+.brand b{color:var(--gold)}
+.nav{display:flex;gap:4px;margin-left:6px}
+.nav a{padding:7px 13px;border-radius:9px;font-size:14px;color:var(--ink-mut);font-weight:600}
+.nav a.on,.nav a:hover{color:var(--ink);background:rgba(201,168,76,.10)}
+.spacer{flex:1}
+.lang{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.lang button{padding:6px 10px;font-size:12.5px;font-weight:700;color:var(--ink-mut)}
+.lang button.on{background:var(--gold);color:#23180a}
+.wallet{display:flex;align-items:center;gap:9px;padding:6px 12px;border:1px solid var(--line);border-radius:11px;background:var(--card-2)}
+.wallet .bal{font-weight:600}
+.wallet .free{font-size:11px;color:var(--gold-soft);border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+@media(max-width:880px){.nav{display:none}.brand{font-size:20px}}
+
+/* ---- match hero ---- */
+.hero{display:flex;align-items:center;gap:16px;margin:18px 0 6px;flex-wrap:wrap}
+.livechip{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:800;letter-spacing:1px;
+  color:#fff;background:var(--no);padding:5px 11px;border-radius:8px}
+.livechip .d{width:7px;height:7px;border-radius:50%;background:#fff;animation:pp2 1.4s infinite}
+@keyframes pp2{50%{opacity:.3}}
+.matchline{display:flex;align-items:center;gap:14px;font-size:15px;flex-wrap:wrap}
+.matchline .vs{font-family:"DM Serif Display",serif;font-size:21px}
+.matchline .meta{color:var(--ink-mut);font-size:13px}
+.watch{color:var(--ink-mut);font-size:13px}
+.mamak{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;
+  color:var(--gold-soft);border:1px solid var(--line);border-radius:999px;padding:6px 14px;
+  background:linear-gradient(90deg,rgba(201,168,76,.14),transparent)}
+
+/* ---- main grid ---- */
+.grid{display:grid;grid-template-columns:1fr 372px;gap:18px;margin-top:10px;align-items:start}
+@media(max-width:1040px){.grid{grid-template-columns:1fr}}
+
+/* stage */
+.stage{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#000;aspect-ratio:16/9}
+.stage canvas{width:100%;height:100%;display:block}
+.stage .scorebar{position:absolute;left:14px;top:14px;display:flex;align-items:center;gap:12px;
+  background:rgba(8,14,34,.78);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+.scorebar .tm{display:flex;align-items:center;gap:7px;font-weight:700}
+.scorebar .sc{font-family:"DM Mono",monospace;font-size:21px;letter-spacing:1px}
+.scorebar .clk{font-family:"DM Mono",monospace;color:var(--yes);font-weight:600;font-size:14px;
+  background:rgba(29,203,134,.12);padding:2px 8px;border-radius:6px}
+.stage .delay{position:absolute;right:14px;top:14px;font-size:11px;color:var(--ink-mut);
+  background:rgba(8,14,34,.7);border:1px solid var(--line);border-radius:8px;padding:5px 9px}
+.goalflash{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(201,168,76,.35),rgba(13,24,56,.6));z-index:5}
+.goalflash b{font-family:"DM Serif Display",serif;font-size:64px;color:#fff;text-shadow:0 4px 30px rgba(201,168,76,.8);animation:gp .5s}
+@keyframes gp{from{transform:scale(.6);opacity:0}}
+.hostcall{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:none;
+  background:var(--gold);color:#23180a;font-weight:700;font-size:13.5px;padding:9px 16px;border-radius:11px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:84%;text-align:center}
+
+/* under-stage tabs: stats / chat / leaderboard */
+.understage{margin-top:14px;border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden}
+.ustabs{display:flex;border-bottom:1px solid var(--line)}
+.ustabs button{flex:1;padding:11px;font-size:13.5px;font-weight:700;color:var(--ink-mut)}
+.ustabs button.on{color:var(--ink);box-shadow:inset 0 -2px 0 var(--gold)}
+.uspanel{padding:14px 16px;display:none}
+.uspanel.on{display:block}
+.integrity-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-mut)}
+.integrity-row:last-child{border:none}
+.integrity-row .ic{font-size:16px;line-height:1.2}
+.integrity-row b{color:var(--ink);font-weight:600}
+.hashbox{font-family:"DM Mono",monospace;font-size:11.5px;color:var(--gold-soft);background:var(--navy-deep);
+  border:1px solid var(--line);border-radius:8px;padding:7px 10px;margin-top:6px;word-break:break-all}
+.wcx-chat{height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.wcx-msg{padding:5px 9px;background:var(--card-2);border-radius:9px;line-height:1.35}
+.wcx-msg b{color:var(--gold-soft);font-weight:600;margin-right:5px}
+.lb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.lb-row .r{width:22px;color:var(--gold);font-weight:700;font-family:"DM Mono",monospace}
+.lb-row .pts{margin-left:auto;font-family:"DM Mono",monospace;color:var(--yes)}
+
+/* ---- flash rail ---- */
+.rail{position:sticky;top:74px;display:flex;flex-direction:column;gap:14px}
+.flashcard{border:1px solid var(--line);border-radius:18px;background:
+  linear-gradient(180deg,rgba(27,46,102,.55),rgba(20,29,63,.9));overflow:hidden;position:relative}
+.fc-head{display:flex;align-items:center;gap:8px;padding:12px 15px;border-bottom:1px solid var(--line)}
+.fc-head .ttl{font-weight:800;font-size:14px;letter-spacing:.3px}
+.fc-head .pari{font-size:11px;color:var(--gold-soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+.fc-head .wcx-eng{margin-left:auto;font-size:11px;font-weight:700;color:#23180a;background:var(--gold-soft);border-radius:6px;padding:3px 8px}
+.wcx-pool{padding:15px}
+.fsm{display:flex;gap:6px;margin-bottom:12px}
+.fsm [data-step]{flex:1;text-align:center;font-size:10.5px;font-weight:700;color:var(--ink-mut);
+  padding:5px 2px;border:1px solid var(--line);border-radius:7px;position:relative}
+.fsm [data-step].on{color:#23180a;background:var(--gold);border-color:var(--gold)}
+.poolq{display:flex;gap:12px;align-items:flex-start;margin-bottom:4px}
+.poolq .ring{flex:0 0 auto}
+.ringwrap{position:relative;width:58px;height:58px}
+.ringwrap svg{transform:rotate(-90deg)}
+.wcx-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:"DM Mono",monospace;font-size:20px;font-weight:600}
+.wcx-fq{font-size:16.5px;font-weight:700;line-height:1.3}
+.wcx-src{font-size:11.5px;color:var(--ink-mut);margin-top:7px;display:flex;align-items:center;gap:5px}
+.wcx-src::before{content:"◎";color:var(--gold)}
+.blindnote{font-size:11px;color:var(--ink-mut);margin:9px 0 11px;line-height:1.4;opacity:.85}
+.sides{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.wcx-side{border:1.5px solid var(--line);border-radius:13px;padding:12px;text-align:left;
+  background:var(--card-2);transition:.14s}
+.wcx-side .lab{font-size:13px;font-weight:800;letter-spacing:.5px}
+.wcx-side[data-side=yes] .lab{color:var(--yes)}
+.wcx-side[data-side=no] .lab{color:var(--no)}
+.wcx-side .wcx-mult{display:block;font-family:"DM Mono",monospace;font-size:23px;font-weight:600;margin-top:3px}
+.wcx-side .wcx-heat{display:block;font-size:11px;color:var(--ink-mut);margin-top:2px}
+.wcx-side.on{border-color:var(--gold);background:rgba(201,168,76,.12);box-shadow:0 0 0 1px var(--gold)}
+.chips{display:flex;gap:7px;margin:12px 0 10px}
+.wcx-chip{flex:1;padding:8px;border:1px solid var(--line);border-radius:9px;font-size:13px;font-weight:600;
+  font-family:"DM Mono",monospace;color:var(--ink-mut)}
+.wcx-chip.on{border-color:var(--gold);color:var(--ink);background:rgba(201,168,76,.1)}
+.wcx-potential{font-size:13px;color:var(--ink-mut);min-height:19px;margin-bottom:10px}
+.wcx-potential b{color:var(--gold-soft);font-family:"DM Mono",monospace;font-size:15px}
+.wcx-go{width:100%;padding:13px;border-radius:12px;font-size:15px;font-weight:800;
+  background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#23180a}
+.wcx-go:disabled{opacity:.5;filter:grayscale(.3)}
+.wcx-state{display:none;margin-top:11px;padding:10px 12px;border-radius:11px;font-weight:700;font-size:14px;text-align:center}
+.wcx-state.win{background:rgba(29,203,134,.16);color:var(--yes);border:1px solid rgba(29,203,134,.4)}
+.wcx-state.lose{background:rgba(255,83,100,.14);color:var(--no);border:1px solid rgba(255,83,100,.35)}
+.wcx-state.lock{background:rgba(201,168,76,.12);color:var(--gold-soft);border:1px solid var(--line)}
+/* RG meter */
+.rg{padding:12px 15px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-mut)}
+.rg-track{height:5px;background:var(--card-2);border-radius:999px;overflow:hidden;margin:7px 0}
+.wcx-rgbar{height:100%;width:0;background:linear-gradient(90deg,var(--yes),var(--gold));transition:width .4s}
+/* cooldown overlay */
+.wcx-cool{display:none;padding:34px 18px;text-align:center}
+.wcx-cool .big{font-family:"DM Serif Display",serif;font-size:22px;margin-bottom:8px}
+.wcx-cd{font-family:"DM Mono",monospace;font-size:42px;color:var(--gold);display:block;margin:10px 0}
+
+/* toast */
+.wcx-toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:var(--navy-2);border:1px solid var(--gold);color:var(--ink);padding:11px 20px;border-radius:12px;
+  font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.wcx-toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---- sections ---- */
+.section{margin-top:34px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.sec-h h2{font-family:"DM Serif Display",serif;font-size:23px;font-weight:400}
+.sec-h .sub{color:var(--ink-mut);font-size:13px}
+.sec-h .more{margin-left:auto;font-size:13px;color:var(--gold-soft);font-weight:600}
+
+/* full-match cpmm */
+.fm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.fm-grid{grid-template-columns:1fr}}
+.wc-mcard{border:1px solid var(--line);border-radius:15px;background:var(--card);padding:16px}
+.wc-mq{font-size:15px;font-weight:700;line-height:1.3;min-height:40px}
+.wc-mrow{display:flex;align-items:baseline;gap:9px;margin:10px 0 13px;flex-wrap:wrap}
+.wc-cents{font-family:"DM Mono",monospace;font-weight:600}
+.wc-cents.big{font-size:34px;color:var(--gold-soft)}
+.wc-cents.sm{font-size:16px}
+.wc-clab{font-size:12px;color:var(--ink-mut)}
+.wc-chg{font-size:12.5px;font-weight:700;font-family:"DM Mono",monospace}
+.wc-chg.up{color:var(--yes)}.wc-chg.down{color:var(--no)}.wc-chg.flat{color:var(--ink-mut)}
+.wc-vol{margin-left:auto;font-size:11.5px;color:var(--ink-mut);font-family:"DM Mono",monospace}
+.wc-duo{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wc-pill{padding:10px;border-radius:10px;font-size:13px;font-weight:700;font-family:"DM Mono",monospace;border:1px solid var(--line)}
+.wc-pill.yes{color:var(--yes);background:rgba(29,203,134,.08)}
+.wc-pill.no{color:var(--no);background:rgba(255,83,100,.07)}
+
+/* champion / lists */
+.cols{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}
+@media(max-width:920px){.cols{grid-template-columns:1fr}}
+.listcard{border:1px solid var(--line);border-radius:15px;background:var(--card);padding:8px 14px 12px}
+.listcard .lc-h{font-weight:800;font-size:14px;padding:10px 2px;color:var(--gold-soft)}
+.wc-row{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.wc-row:last-child{border:none}
+.wc-rank{width:20px;color:var(--ink-mut);font-family:"DM Mono",monospace;font-size:13px}
+.wc-team{display:flex;align-items:center;gap:7px;font-weight:600}
+.wc-flag{font-size:18px}
+.wc-row .wc-cents{margin-left:auto}
+.wc-mini-buy{font-size:11.5px;font-weight:700;color:#23180a;background:var(--gold-soft);border-radius:7px;padding:5px 11px}
+.wc-grp-h{font-weight:700;font-size:13px;color:var(--ink-mut);padding:8px 2px 4px}
+.wc-grow-lab{font-size:11px;color:var(--ink-mut)}
+.wc-ko-stage{margin-left:auto;font-size:12px;color:var(--ink-mut)}
+.wc-cents.sm{color:var(--gold-soft)}
+
+/* news */
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+@media(max-width:920px){.news-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.news-grid{grid-template-columns:1fr}}
+.wc-news{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);transition:.15s}
+.wc-news:hover{transform:translateY(-3px);border-color:var(--gold)}
+.wc-news-thumb{height:120px;display:flex;align-items:flex-end;padding:10px}
+.wc-news-flags{font-size:26px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+.wc-news-body{padding:12px 13px 14px}
+.wc-news-src{font-size:11.5px;color:var(--gold-soft);font-weight:600;margin-bottom:5px}
+.wc-news-title{font-size:14.5px;font-weight:700;line-height:1.35}
+.wc-news-tags{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.wc-news-tags span{font-size:11px;color:var(--ink-mut);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+
+/* footer */
+.foot{margin-top:46px;padding-top:22px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-mut);line-height:1.7}
+.foot b{color:var(--gold-soft)}
+.demo-switch{position:fixed;right:16px;bottom:16px;z-index:50;display:flex;gap:7px}
+.demo-switch a{font-size:12px;font-weight:700;background:var(--navy-2);border:1px solid var(--gold);color:var(--gold-soft);
+  padding:8px 12px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topin">
+  <div class="brand"><span class="dot"></span>Sorak <b>LIVE</b></div>
+  <nav class="nav">
+    <a class="on" data-t="nav_live">直播</a><a data-t="nav_markets">盘口</a>
+    <a data-t="nav_news">新闻</a><a data-t="nav_wallet">钱包</a>
+  </nav>
+  <div class="spacer"></div>
+  <div class="lang" id="lang">
+    <button data-l="zh">中</button><button data-l="en">EN</button><button data-l="ms">BM</button>
+  </div>
+  <div class="wallet"><span class="mono">◆ <span class="wcx-bal">1,000</span></span>
+    <span class="free" data-t="free_badge">免费积分场</span></div>
+</div></div>
+
+<div class="wrap">
+
+  <!-- match hero -->
+  <div class="hero">
+    <span class="livechip"><span class="d"></span><span data-t="live_now">直播中</span></span>
+    <div class="matchline">
+      <span class="vs"><span id="h-home"></span> <span style="color:var(--ink-mut)">vs</span> <span id="h-away"></span></span>
+      <span class="meta" id="h-meta"></span>
+    </div>
+    <span class="watch">👁 <span class="mono">38,402</span> <span data-t="watching">人在看</span></span>
+    <span class="mamak" data-t="mamak">Mamak Mode · 陪你熬夜看球</span>
+  </div>
+
+  <div class="grid">
+    <!-- left: stage + understage -->
+    <div>
+      <div class="stage" id="flashroot-stage">
+        <canvas class="wcx-canvas" width="960" height="540"></canvas>
+        <div class="scorebar">
+          <span class="tm" id="s-home"></span>
+          <span class="sc wcx-score">0 : 0</span>
+          <span class="tm" id="s-away"></span>
+          <span class="clk wcx-clock">12'</span>
+        </div>
+        <div class="delay" data-t="delay_note">直播延迟约 8 秒</div>
+        <div class="goalflash wcx-goal"><b>GOAL</b></div>
+        <div class="hostcall wcx-host"></div>
+      </div>
+
+      <div class="understage">
+        <div class="ustabs">
+          <button class="on" data-tab="chat" data-t="nav_news_chat">实况聊天</button>
+          <button data-tab="lb">排行榜</button>
+          <button data-tab="trust" data-t="integrity">诚信与结算</button>
+        </div>
+        <div class="uspanel on" data-panel="chat"><div class="wcx-chat"></div></div>
+        <div class="uspanel" data-panel="lb" id="lb"></div>
+        <div class="uspanel" data-panel="trust" id="trust"></div>
+      </div>
+    </div>
+
+    <!-- right: flash rail -->
+    <aside class="rail" id="flashroot">
+      <div class="flashcard">
+        <div class="fc-head">
+          <span class="ttl" data-t="sec_flash">闪电盘 · 直播中</span>
+          <span class="pari" data-t="pari">彩池制</span>
+          <span class="wcx-eng">免费积分</span>
+        </div>
+        <div class="wcx-pool">
+          <div class="fsm wcx-fsm">
+            <span data-step data-t="fsm_open">投注中</span><span data-step data-t="fsm_lock">已锁</span>
+            <span data-step data-t="fsm_prov">临时</span><span data-step data-t="fsm_official">官方</span>
+          </div>
+          <div class="poolq">
+            <div class="ring"><div class="ringwrap">
+              <svg width="58" height="58"><circle cx="29" cy="29" r="21" fill="none" stroke="rgba(201,168,76,.16)" stroke-width="5"/>
+                <circle class="wcx-ring-fg" cx="29" cy="29" r="21" fill="none" stroke="#C9A84C" stroke-width="5"
+                  stroke-linecap="round" stroke-dasharray="131.9" stroke-dashoffset="0"/></svg>
+              <span class="wcx-ring-num">20</span>
+            </div></div>
+            <div style="flex:1">
+              <div class="wcx-fq">—</div>
+              <div class="wcx-src"></div>
+            </div>
+          </div>
+          <div class="blindnote" data-t="blind_pool">盲池:封盘前只显示预计派彩,不显示双方池</div>
+          <div class="sides">
+            <button class="wcx-side" data-side="yes"><span class="lab" data-t="yes">YES</span>
+              <span class="wcx-mult">≈—×</span><span class="wcx-heat"></span></button>
+            <button class="wcx-side" data-side="no"><span class="lab" data-t="no">NO</span>
+              <span class="wcx-mult">≈—×</span><span class="wcx-heat"></span></button>
+          </div>
+          <div class="chips">
+            <button class="wcx-chip on" data-amt="50">50</button>
+            <button class="wcx-chip" data-amt="100">100</button>
+            <button class="wcx-chip" data-amt="250">250</button>
+          </div>
+          <div class="wcx-potential" data-t="pick_side">选边后显示预计派彩</div>
+          <button class="wcx-go">下注</button>
+          <div class="wcx-state"></div>
+        </div>
+        <div class="wcx-cool">
+          <div class="big" data-t="cooldown_t">歇一歇,喝杯 teh tarik</div>
+          <span class="wcx-cd">12</span>
+          <div style="font-size:12px;color:var(--ink-mut)" data-t="rg_cool">连续 6 盘后自动冷却</div>
+        </div>
+        <div class="rg">
+          <div data-t="rg_title">负责任游戏</div>
+          <div class="rg-track"><div class="wcx-rgbar"></div></div>
+          <div class="wcx-rgtxt">本场 <span class="wcx-played">0</span>/12</div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- full-match cpmm -->
+  <div class="section">
+    <div class="sec-h"><h2 data-t="sec_fullmatch">全场盘</h2>
+      <span class="sub" data-t="cpmm_note">美分=概率,随成交漂移(非彩池倍数)</span></div>
+    <div class="fm-grid" id="fm"></div>
+  </div>
+
+  <!-- markets: champion / groups / knockout -->
+  <div class="section">
+    <div class="sec-h"><h2 data-t="sec_champion">冠军盘</h2><span class="sub">2026</span></div>
+    <div class="cols">
+      <div class="listcard"><div class="lc-h" data-t="sec_champion">冠军盘</div><div id="champ"></div></div>
+      <div class="listcard"><div class="lc-h" data-t="sec_groups">小组出线</div><div id="groups"></div></div>
+      <div class="listcard"><div class="lc-h" data-t="sec_knockout">淘汰赛晋级</div><div id="ko"></div></div>
+    </div>
+  </div>
+
+  <!-- news -->
+  <div class="section">
+    <div class="sec-h"><h2 data-t="sec_news">世界杯新闻</h2>
+      <a class="more" data-t="more_news">更多新闻 →</a></div>
+    <div class="news-grid" id="news"></div>
+  </div>
+
+  <div class="foot">
+    <div><b>Sorak</b> — 带盘直播 · 世界杯。<span data-t="region_note">真钱仅限持牌且 in-play 合法地区;其他地区为免费积分场。</span></div>
+    <div style="margin-top:6px" data-t="imdo">结算依据独立现场数据官(IMDO),与盘口运营隔离。</div>
+    <div style="margin-top:6px">Demo · mock data · 设计方向 A「Stadium / 体育场夜场」</div>
+  </div>
+</div>
+
+<div class="demo-switch">
+  <a href="./index.html">← 挑选</a>
+  <a href="./b-broadsheet.html">B</a>
+  <a href="./c-mobile.html">C</a>
+</div>
+
+<script src="./wc-data.js"></script>
+<script src="./wc-engine.js"></script>
+<script>
+(function(){
+  var W=window.WC, E=window.WCEngine;
+  var lang = E.langFromUrl();
+
+  function applyStatic(){
+    document.documentElement.lang = lang==='zh'?'zh':lang;
+    // data-t text nodes
+    document.querySelectorAll('[data-t]').forEach(function(el){
+      var k=el.getAttribute('data-t'); var v=W.t(k,lang);
+      if(v && v!==k) el.textContent=v;
+    });
+    // extra strings not in dict
+    var EX={ nav_news_chat:{zh:'实况聊天',en:'Live chat',ms:'Sembang'},
+             cpmm_note:{zh:'美分=概率,随成交漂移(非彩池倍数)',en:'Cents = probability, drifts with trades (not pool odds)',ms:'Sen = peluang, berubah ikut dagangan'} };
+    document.querySelectorAll('[data-t]').forEach(function(el){
+      var k=el.getAttribute('data-t'); if(EX[k]) el.textContent=W.L(EX[k],lang);
+    });
+    // lang toggle on-state
+    document.querySelectorAll('#lang button').forEach(function(b){ b.classList.toggle('on', b.dataset.l===lang); });
+    // match hero
+    var m=W.MATCH, h=W.TEAM[m.home], a=W.TEAM[m.away];
+    var hn=h.flag+' '+(h[lang]||h.en), an=a.flag+' '+(a[lang]||a.en);
+    document.getElementById('h-home').textContent=hn;
+    document.getElementById('h-away').textContent=an;
+    document.getElementById('h-meta').textContent=(m.stage[lang]||m.stage.en)+' · '+(m.venue[lang]||m.venue.en)+' · '+m.kickoff_my;
+    document.getElementById('s-home').textContent=h.flag+' '+m.home;
+    document.getElementById('s-away').textContent=a.flag+' '+m.away;
+  }
+
+  function renderLists(){
+    document.getElementById('fm').innerHTML = E.renderFullmatch(lang);
+    document.getElementById('champ').innerHTML = E.renderChampion(lang);
+    document.getElementById('groups').innerHTML = E.renderGroups(lang);
+    document.getElementById('ko').innerHTML = E.renderKnockout(lang);
+    document.getElementById('news').innerHTML = E.renderNews(lang);
+    // leaderboard
+    var lb=[['Hafiz',8240],['小薇',7110],['Aiman',6820],['Nurul',5990],['Daniel',5230],['美玲',4810]];
+    document.getElementById('lb').innerHTML = lb.map(function(x,i){
+      return '<div class="lb-row"><span class="r">'+(i+1)+'</span><span>'+x[0]+'</span><span class="pts">◆ '+W.fmtInt(x[1])+'</span></div>';}).join('');
+    // trust panel
+    document.getElementById('trust').innerHTML =
+      '<div class="integrity-row"><span class="ic">🛡</span><div><b>IMDO</b> — '+W.t('imdo',lang)+'</div></div>'+
+      '<div class="integrity-row"><span class="ic">⏱</span><div>'+W.t('delay_note',lang)+'</div></div>'+
+      '<div class="integrity-row"><span class="ic">#</span><div><b>'+W.L({zh:'规则哈希',en:'Rules hash',ms:'Hash peraturan'},lang)+'</b> — '+W.t('rules_hash',lang)+
+        '<div class="hashbox">rules_sha256: 9f2c·a17e·BRA-ARG·nextgoal·v1 · 4b8e0d…c1a7</div></div></div>'+
+      '<div class="integrity-row"><span class="ic">↺</span><div>'+W.L({zh:'VOID = 全额退款(含手续费)',en:'VOID = full refund incl. rake',ms:'VOID = bayar balik penuh'},lang)+'</div></div>';
+  }
+
+  function tabs(){
+    document.querySelectorAll('.ustabs button').forEach(function(b){
+      b.addEventListener('click',function(){
+        document.querySelectorAll('.ustabs button').forEach(function(x){x.classList.toggle('on',x===b);});
+        document.querySelectorAll('.uspanel').forEach(function(p){p.classList.toggle('on',p.dataset.panel===b.dataset.tab);});
+      });
+    });
+  }
+
+  document.getElementById('lang').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    localStorage.setItem('wc-lang',b.dataset.l);
+    var u=new URL(location.href); u.searchParams.set('lang',b.dataset.l); location.href=u.toString();
+  });
+
+  applyStatic(); renderLists(); tabs();
+  // mini-buy + cpmm pills are demo-only -> toast
+  document.body.addEventListener('click',function(e){
+    if(e.target.closest('.wc-mini-buy')||e.target.closest('.wc-pill')){
+      E.toast(document.body, W.L({zh:'Demo:下单走全场盘页',en:'Demo: opens full-match page',ms:'Demo: buka halaman penuh'},lang));
+    }
+  });
+  E.flash(document.body, lang);
+})();
+</script>
+</body>
+</html>
