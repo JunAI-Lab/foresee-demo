@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Foresee LIVE — 带盘直播 · 闪电盘 v2</title>
+<title>Sorak LIVE — 带盘直播 · 闪电盘 v2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Schibsted+Grotesk:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -190,7 +190,7 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font
 <header class="lv-top">
   <div class="lv-brand">
     <svg width="29" height="29" viewBox="0 0 32 32" fill="none"><path d="M5 16 H12.5" stroke="#C9A84C" stroke-width="2.7" stroke-linecap="round"/><path d="M12.5 16 C16 16,17.5 14,22 9" stroke="#C9A84C" stroke-width="2.7" stroke-linecap="round"/><path d="M12.5 16 C16 16,17.5 18,22 23" stroke="#C9A84C" stroke-width="2.7" stroke-linecap="round"/><circle cx="23" cy="8" r="3.2" fill="#1DCB86"/><circle cx="23" cy="24" r="3.2" fill="#FF5364"/><circle cx="5" cy="16" r="2.2" fill="#C9A84C"/></svg>
-    Foresee <b>LIVE</b>
+    Sorak <b>LIVE</b>
   </div>
   <span class="lv-live"><i></i>直播中</span>
   <span class="lv-track"><span class="g">◆</span>免费积分场<span class="s">奖品=体验/周边</span></span>
@@ -319,11 +319,11 @@ html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font
 </div>
 
 <footer class="lv-foot">
-  <span class="b">Foresee</span>
+  <span class="b">Sorak</span>
   <a href="markets.html">全部市场</a>
   <a href="markets.html">钱包 / 资产</a>
   <a href="javascript:void(0)" onclick="document.getElementById('toast').textContent='合规:免费积分场全球可玩;真钱仅持牌地域。本演示不构成要约。';document.getElementById('toast').classList.add('on');setTimeout(()=>document.getElementById('toast').classList.remove('on'),2600)">合规与责任游戏</a>
-  <span class="r">© 2026 Foresee · 娱乐预测 · 带盘直播 · 内部演示</span>
+  <span class="r">© 2026 Sorak · 娱乐预测 · 带盘直播 · 内部演示</span>
 </footer>
 
 <div class="lv-note">⚠ 演示页面(带盘直播 v2):比赛画面、彩池与数据均为模拟,用于展示「直播间即交易所 / 闪电盘彩池制 / 盲池 / 封盘倒计时 / 双轨积分场 / 负责任游戏冷却 / 诚信可见」的产品形态。真钱玩法仅在持牌地域、经合规与当地法律审核后提供;马来西亚本地仅提供免费积分场。</div>
@@ -513,7 +513,7 @@ const LINES=['进一个啦!!','YES 冲了','我连胜 ×3 了哈哈','东姑加�
 function chatPush(n,m){const c=$('chat');const d=document.createElement('div');d.className='lv-msg';d.innerHTML='<b>'+n+'</b> '+m;
   c.appendChild(d);while(c.children.length>40)c.firstChild.remove();c.scrollTop=c.scrollHeight;}
 setInterval(()=>chatPush(NAMES[Math.floor(Math.random()*NAMES.length)],LINES[Math.floor(Math.random()*LINES.length)]),2400);
-chatPush('sys','欢迎来到 Foresee LIVE · ASSA 慈善赛带盘直播 🎙 免费积分场');
+chatPush('sys','欢迎来到 Sorak LIVE · ASSA 慈善赛带盘直播 🎙 免费积分场');
 
 /* viewers */
 setInterval(()=>{S.viewers=Math.max(9000,S.viewers+Math.floor(Math.random()*120-50));$('viewers').textContent=fmt(S.viewers);},2000);

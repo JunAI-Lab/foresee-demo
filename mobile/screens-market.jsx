@@ -21,7 +21,7 @@ function Home({theme, lang, nav, ui}){
     h('div',{className:'mx-head'},
       h('div',{className:'mx-head-row'},
         h(FX.Logo,{size:26}),
-        h('div',{className:'mx-brand'}, 'Foresee'),
+        h('div',{className:'mx-brand'}, 'Sorak'),
         h('button',{className:'mx-icon-btn',onClick:ui.toggleLang,title:'Language'},
           h('span',{style:{fontSize:12,fontWeight:800}}, lang==='en'?'EN':'中')),
         h('button',{className:'mx-icon-btn',onClick:ui.toggleTheme,title:'Theme'},

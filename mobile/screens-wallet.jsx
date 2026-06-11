@@ -104,7 +104,7 @@ function EmptyPos({lang,nav}){
 /* ---------------- DEPOSIT ---------------- */
 function Deposit({lang, nav, ui, store}){
   const [method,setMethod]=useState('crypto');
-  const addr='TZ4Up1Vg9k7xN3Foresee8mQpYrL2sWcDx';
+  const addr='TZ4Up1Vg9k7xN3Sorak8mQpYrL2sWcDx';
   return h('div',{className:'mx-app'},
     h(PushHeader,{title:t('depositTitle',lang),onBack:nav.pop}),
     h('div',{className:'mx-body f-scroll',style:{padding:'16px 18px'}},

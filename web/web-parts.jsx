@@ -25,7 +25,7 @@ function Nav({lang, balance, onPositions, onDeposit, toggleLang, onNav}){
     h('div',{className:'w-nav-in'},
       h('div',{className:'w-brand',style:{cursor:'pointer'},onClick:()=>onNav('top')},
         h(Logo,{size:34}),
-        h('div',null, h('div',{className:'nm'},'Foresee'), h('div',{className:'sb'},tx('Predict · Talent · Live','预测 · 星势力 · 现场')))),
+        h('div',null, h('div',{className:'nm'},'Sorak'), h('div',{className:'sb'},tx('Predict · Talent · Live','预测 · 星势力 · 现场')))),
       h('div',{className:'w-links'}, links.map(([k,lab])=>h('a',{key:k,onClick:()=>onNav(k)}, lab))),
       h('div',{className:'w-nav-right'},
         h('div',{className:'w-balpill',onClick:onPositions},
@@ -186,7 +186,7 @@ function Footer({lang, onNav}){
   return h('footer',{className:'w-foot'},
     h('div',{className:'w-foot-top'},
       h('div',null,
-        h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:4}}, h(Logo,{size:30,mono:true}), h('span',{className:'nm'},'Foresee')),
+        h('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:4}}, h(Logo,{size:30,mono:true}), h('span',{className:'nm'},'Sorak')),
         h('p',null, tx('A prediction exchange for the talent, motorsport and live events you follow. Trade outcomes in real USDT.','一个面向艺人、赛车与现场活动的预测交易所。用真实 USDT 交易结果。')),
         h('div',{className:'w-risk'}, t('riskNote',lang))),
       h('div',null, h('h4',null,tx('Trade','交易')),
@@ -196,7 +196,7 @@ function Footer({lang, onNav}){
       h('div',null, h('h4',null,tx('Trust & Safety','合规与安全')),
         [tx('KYC & AML','KYC 与反洗钱'),tx('Risk disclosure','风险披露'),tx('Responsible trading','理性交易'),tx('Terms','用户协议')].map((l,i)=>h('a',{key:i},l)))),
     h('div',{className:'w-foot-bot'},
-      h('span',null,'© 2026 Foresee Exchange. '+tx('All rights reserved.','保留所有权利。')),
+      h('span',null,'© 2026 Sorak Exchange. '+tx('All rights reserved.','保留所有权利。')),
       h('span',{style:{display:'flex',gap:18}}, h('a',{style:{display:'inline',margin:0}},tx('Privacy','隐私')), h('a',{style:{display:'inline',margin:0}},tx('Terms','条款')))));
 }
 

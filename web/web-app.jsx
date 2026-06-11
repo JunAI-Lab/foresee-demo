@@ -208,7 +208,7 @@ function TradeModal({state, lang, store, onClose, onToast, onDeposit}){
 /* ====================== DEPOSIT MODAL ====================== */
 function DepositModal({open, lang, store, onClose, onToast}){
   const [amt,setAmt]=useState('100');
-  const addr='TZ4Up1Vg9k7xN3Foresee8mQpYrL2sWcDx';
+  const addr='TZ4Up1Vg9k7xN3Sorak8mQpYrL2sWcDx';
   return h('div',{className:'w-mask'+(open?' on':''),onClick:onClose},
     h('div',{className:'w-modal',onClick:e=>e.stopPropagation()},
       h('div',{className:'w-modal-h'},
@@ -338,8 +338,8 @@ function App(){
 
     /* mobile overlay */
     h('div',{className:'w-phone-mask'+(phone?' on':''),onClick:()=>setPhone(false)},
-      h('div',{style:{color:'var(--gold-soft)',fontWeight:700,fontSize:13,letterSpacing:'.1em',textTransform:'uppercase'}}, tx(lang,'Foresee · one-thumb betting','Foresee · 单手下注')),
-      h('div',{className:'w-phone-frame',onClick:e=>e.stopPropagation()}, h('iframe',{src:'mobile.html',title:'Foresee mobile'})),
+      h('div',{style:{color:'var(--gold-soft)',fontWeight:700,fontSize:13,letterSpacing:'.1em',textTransform:'uppercase'}}, tx(lang,'Sorak · one-thumb betting','Sorak · 单手下注')),
+      h('div',{className:'w-phone-frame',onClick:e=>e.stopPropagation()}, h('iframe',{src:'mobile.html',title:'Sorak mobile'})),
       h('button',{className:'btn',style:{background:'rgba(255,255,255,.1)',color:'var(--cream)'},onClick:()=>setPhone(false)}, tx(lang,'Close','关闭'))),
 
     /* studio control */

@@ -149,7 +149,7 @@ const TXNS = [
 
 /* ---------- i18n ---------- */
 const STR = {
-  appName:{en:'Foresee',zh:'Foresee'},
+  appName:{en:'Sorak',zh:'Sorak'},
   nav_markets:{en:'Markets',zh:'市场'}, nav_portfolio:{en:'Portfolio',zh:'资产'},
   nav_activity:{en:'Activity',zh:'动态'}, nav_profile:{en:'Profile',zh:'我的'},
   search:{en:'Search markets…',zh:'搜索市场…'},
@@ -201,7 +201,7 @@ const cents = (c)=> c+'¢';
 function Logo({size=30, mono=false}){
   const s = size;
   const brand = mono?'currentColor':'var(--brand)';
-  return h('svg',{width:s,height:s,viewBox:'0 0 32 32',fill:'none','aria-label':'Foresee'},
+  return h('svg',{width:s,height:s,viewBox:'0 0 32 32',fill:'none','aria-label':'Sorak'},
     h('path',{d:'M5 16 H12.5',stroke:brand,strokeWidth:2.7,strokeLinecap:'round'}),
     h('path',{d:'M12.5 16 C16 16, 17.5 14, 22 9',stroke:brand,strokeWidth:2.7,strokeLinecap:'round'}),
     h('path',{d:'M12.5 16 C16 16, 17.5 18, 22 23',stroke:brand,strokeWidth:2.7,strokeLinecap:'round'}),
@@ -213,7 +213,7 @@ function Logo({size=30, mono=false}){
 function Wordmark({size=20}){
   return h('div',{style:{display:'flex',alignItems:'center',gap:9}},
     h(Logo,{size:size*1.5}),
-    h('span',{style:{fontWeight:800,fontSize:size,letterSpacing:'-.025em'}},'Foresee'));
+    h('span',{style:{fontWeight:800,fontSize:size,letterSpacing:'-.025em'}},'Sorak'));
 }
 
 /* ---------- Sparkline ---------- */
@@ -244,7 +244,7 @@ const ROSTER = [
 /* ---------- events / tickets (each pairs with a live market) ---------- */
 const EVENTS = [
   { id:'assa',      featured:true, day:'10', mon:{en:'Oct',zh:'十月'}, title:{en:'ASSA Charity Match',zh:'ASSA 慈善赛'}, sub:{en:'All Stars vs Johor Select',zh:'All Stars vs 柔佛精英'}, venue:{en:'MBPJ Stadium, Selangor',zh:'MBPJ 体育场·雪兰莞'}, when:{en:'Sat, 10 Oct · 5:00 PM',zh:'10月10日(六)· 17:00'}, status:{en:'Featured',zh:'焦点'}, marketId:'assa', from:88, tiers:[{n:{en:'Grandstand',zh:'看台'},p:88},{n:{en:'VIP',zh:'VIP'},p:288},{n:{en:'VVIP Royal',zh:'VVIP 贵宾'},p:688}] },
-  { id:'sepang',    day:'28', mon:{en:'Jun',zh:'六月'}, title:{en:'Sepang Home Round',zh:'雪邦主场站'}, sub:{en:'Foresee Racing · round 4',zh:'Foresee 车队 · 第4站'}, venue:{en:'Sepang International Circuit',zh:'雪邦国际赛道'}, when:{en:'Sun, 28 Jun · 3:00 PM',zh:'6月28日(日)· 15:00'}, status:{en:'Selling fast',zh:'热销中'}, marketId:'podium', from:120 },
+  { id:'sepang',    day:'28', mon:{en:'Jun',zh:'六月'}, title:{en:'Sepang Home Round',zh:'雪邦主场站'}, sub:{en:'Sorak Racing · round 4',zh:'Sorak 车队 · 第4站'}, venue:{en:'Sepang International Circuit',zh:'雪邦国际赛道'}, when:{en:'Sun, 28 Jun · 3:00 PM',zh:'6月28日(日)· 15:00'}, status:{en:'Selling fast',zh:'热销中'}, marketId:'podium', from:120 },
   { id:'concert',   day:'12', mon:{en:'Dec',zh:'十二月'}, title:{en:'Year-End Concert',zh:'年终演唱会'}, sub:{en:'Maya Suria · live in arena',zh:'玛雅·苏丽雅 · 体育馆现场'}, venue:{en:'Axiata Arena, Kuala Lumpur',zh:'Axiata 体育馆·吉隆坡'}, when:{en:'Sat, 12 Dec · 8:00 PM',zh:'12月12日(六)· 20:00'}, status:{en:'On sale',zh:'发售中'}, marketId:'sellout', from:128 },
   { id:'driverday', day:'04', mon:{en:'Jul',zh:'七月'}, title:{en:'Driver Day Meet & Greet',zh:'车手见面会'}, sub:{en:'Meet the signed drivers',zh:'与签约车手见面'}, venue:{en:'Johor Premium Outlets',zh:'柔佛名牌折扣中心'}, when:{en:'Sat, 04 Jul · 2:00 PM',zh:'7月4日(六)· 14:00'}, status:{en:'Free entry',zh:'免费入场'}, marketId:'peoplechoice', from:0 },
 ];
