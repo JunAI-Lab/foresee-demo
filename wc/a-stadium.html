@@ -277,7 +277,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
       <div class="understage">
         <div class="ustabs">
           <button class="on" data-tab="chat" data-t="nav_news_chat">实况聊天</button>
-          <button data-tab="lb">排行榜</button>
+          <button data-tab="lb" data-t="tab_lb">排行榜</button>
           <button data-tab="trust" data-t="integrity">诚信与结算</button>
         </div>
         <div class="uspanel on" data-panel="chat"><div class="wcx-chat"></div></div>
@@ -389,11 +389,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
     document.documentElement.lang = lang==='zh'?'zh':lang;
     // data-t text nodes
     document.querySelectorAll('[data-t]').forEach(function(el){
-      var k=el.getAttribute('data-t'); var v=W.t(k,lang);
-      if(v && v!==k) el.textContent=v;
+      var k=el.getAttribute('data-t');
+      if(W.STR[k]) el.textContent=W.L(W.STR[k],lang);   // dict key -> always apply (handles en value==key)
     });
     // extra strings not in dict
     var EX={ nav_news_chat:{zh:'实况聊天',en:'Live chat',ms:'Sembang'},
+             tab_lb:{zh:'排行榜',en:'Leaderboard',ms:'Carta'},
              cpmm_note:{zh:'美分=概率,随成交漂移(非彩池倍数)',en:'Cents = probability, drifts with trades (not pool odds)',ms:'Sen = peluang, berubah ikut dagangan'} };
     document.querySelectorAll('[data-t]').forEach(function(el){
       var k=el.getAttribute('data-t'); if(EX[k]) el.textContent=W.L(EX[k],lang);
